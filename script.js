@@ -1,5 +1,8 @@
+var users = [];
+
 $(document).ready(function(){
     $("#dialog").dialog({autoOpen: false});
+    
 
 $("#addRec").click(function () {
     $("#dialog").dialog("open");
@@ -38,40 +41,18 @@ $("#dialog").dialog({
           "<td>" + $( "#gender" ).val() + "</td>" +
           "<td>" + $( "#zodiac" ).val() + "</td>" +
         "</tr>" );
+        user = {};
+        
+        user = localstorage.user;
+        user.phone = $( "#phone" ).val();
+        user.name = $( "#name" ).val();
+        user.place = $( "#place" ).val();
+        user.gender = $( "#gender" ).val();
+        user.zodiac = $( "#zodiac" ).val();
+        
+        
         $(this).dialog( "close" );
-      }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
+      }////////////////////////////////////////////////////////
 function clickCounter() {
     if (localStorage.clickcount) {
         localStorage.clickcount = Number(localStorage.clickcount) + 1;
