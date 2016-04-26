@@ -3,13 +3,14 @@ $(document).ready(function () {
 
     function addRecord() {
         var test = + $("#phone").val();
- 
-             localStorage.users[test]['phone'] = $("#phone").val();
-        localStorage.users[test]['name'] = $("#name").val();
-        localStorage.users[test]['place'] = $("#place").val();
-        localStorage.users[test]['gender'] = $("#gender").val();
-        localStorage.users[test]['zodiac'] = $("#zodiac").val();
-        localStorage.users[test]['note'] = $("#note").val();
+            localStorage.users = {};
+
+             localStorage.phone = $("#phone").val();
+        //localStorage.users[test]['name'] = $("#name").val();
+        //localStorage.users[test]['place'] = $("#place").val();
+        //localStorage.users[test]['gender'] = $("#gender").val();
+        //localStorage.users[test]['zodiac'] = $("#zodiac").val();
+        //localStorage.users[test]['note'] = $("#note").val();
         var proba = 555;   
         
         
@@ -73,51 +74,5 @@ $(document).ready(function () {
             }
         ]
     });
-listRecords();
+//listRecords();
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////
-function clickCounter() {
-    if (localStorage.clickcount) {
-        localStorage.clickcount = Number(localStorage.clickcount) + 1;
-    } else {
-        localStorage.clickcount = 1;
-    }
-    document.getElementById("result").innerHTML = "You have clicked the button " +
-            localStorage.clickcount + " time(s).";
-}
-
-
-
-
