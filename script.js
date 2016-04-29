@@ -5,41 +5,36 @@ $(document).ready(function () {
         var userId = thisUser.phone = $("#phone").val();
         var name = $("#name");
         var phone = $("#phone");
-
         thisUser.name = $("#name").val();
-
-
         thisUser.place = $("#place").val();
         thisUser.gender = $("#gender").val();
         thisUser.zodiac = $("#zodiac").val();
         thisUser.note = $("#note").val();
-        valid = valid && checkLength(name, "username", 5, 12);
         valid = valid && checkLength(phone, "phone number", 5, 12);
-        valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter.");
         valid = valid && checkRegexp(phone, /[0-9]/, "Phone number may consist of +, 0-9");
-        var name3 = '';
+        valid = valid && checkLength(name, "името", 5, 12);
+        valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter.");
         var userrr = {};
         var potrebiteli = JSON.parse(localStorage.getItem("users"));
-        if (potrebiteli) {
+        if (valid && potrebiteli) {
             for (userrr in potrebiteli) {
                 var currentPhone = potrebiteli[userrr].phone;
                 var currentName = potrebiteli[userrr].name;
-                if (currentName === thisUser.name) {
-                    tips.text("weche go ima imeto");
+                if (currentPhone === thisUser.phone) {
+                    tips.text("weche go ima телефона");
                     valid = false;
-                }
-                else if (currentPhone === thisUser.phone) {
-                    tips.text("weche go ima phoneto");
+                } else if (currentName === thisUser.name) {
+                    tips.text("weche go ima това име");
                     valid = false;
                 }
             }
 
             potrebiteli[userId] = thisUser;
-            localStorage.setItem("users", JSON.stringify(potrebiteli));
+            //localStorage.setItem("users", JSON.stringify(potrebiteli));
         } else {
             var potrebiteli = {};
             potrebiteli[userId] = thisUser;
-            localStorage.setItem("users", JSON.stringify(potrebiteli));
+            //localStorage.setItem("users", JSON.stringify(potrebiteli));
         }
         if (valid) {
             $("#phoneTable tbody").append("<tr class='row' id='" + userId + "'>" +
@@ -53,6 +48,8 @@ $(document).ready(function () {
                     "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
                     "</tr>");
             $(this).dialog("close");
+            localStorage.setItem("users", JSON.stringify(potrebiteli));
+
         }
         return valid;
         $(".trash").click(function () {
@@ -120,7 +117,7 @@ $(document).ready(function () {
     }
 
     function editRec(id) {
-        $("#dialog input").removeAttr("disabled")
+        $("#dialog input").removeAttr("disabled");
         var restoredUsers = JSON.parse(localStorage.getItem("users"));
         var phone = restoredUsers[id].phone;
         $("#dialog #phone").val(phone);
@@ -167,9 +164,10 @@ $(document).ready(function () {
                 icons: {
                     primary: "ui-icon-heart"
                 },
-                click: addRecord,
-                // Uncommenting the following line would hide the text,
-                // resulting in the label being used as a tooltip
+                click: addRecord
+
+                        // Uncommenting the following line would hide the text,
+                        // resulting in the label being used as a tooltip
             },
             {
                 text: "Отмени",
