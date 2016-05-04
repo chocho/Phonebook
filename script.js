@@ -28,13 +28,10 @@ $(document).ready(function () {
                     valid = false;
                 }
             }
-
             potrebiteli[userId] = thisUser;
-            //localStorage.setItem("users", JSON.stringify(potrebiteli));
         } else {
             var potrebiteli = {};
             potrebiteli[userId] = thisUser;
-            //localStorage.setItem("users", JSON.stringify(potrebiteli));
         }
         if (valid) {
             $("#phoneTable tbody").append("<tr class='row' id='" + userId + "'>" +
@@ -48,14 +45,27 @@ $(document).ready(function () {
                     "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
                     "</tr>");
             $(this).dialog("close");
+            $(".trash").click(function () {
+                $("#" + userId + "").remove();
+                ;
+            });
+            $(".view").on("click", function () {
+                var id = $(this).attr("id");
+                $("#dialog").dialog("open");
+                //$(this).parentsUntil("tbody").remove();
+                viewRec(id);
+            });
+            $(".edit").on("click", function () {
+                var id = $(this).attr("id");
+                $("#dialog").dialog("open");
+                //$(this).parentsUntil("tbody").remove();
+                editRec(id);
+            });
             localStorage.setItem("users", JSON.stringify(potrebiteli));
-
+            //listRecords();
         }
         return valid;
-        $(".trash").click(function () {
-            $("#" + userId + "").remove();
-            ;
-        });
+
     }
     ;
 
@@ -83,7 +93,7 @@ $(document).ready(function () {
                 });
                 $(".view").on("click", function () {
                     var id = $(this).attr("id");
-                    $("#dialog").dialog("open");
+                    $("#dialog2").dialog("open");
                     //$(this).parentsUntil("tbody").remove();
                     viewRec(id);
                 });
@@ -99,21 +109,20 @@ $(document).ready(function () {
     }
     ;
     function viewRec(id) {
-        $("#dialog input").attr("disabled", "disabled");
-        $("#dialog td").css("background-color", "#000");
+        $("#dialog2 p").css("background-color", "#000");
         var restoredUsers = JSON.parse(localStorage.getItem("users"));
         var phone = restoredUsers[id].phone;
-        $("#dialog #phone").val(phone);
+        $("#dialog2 #phone").text(phone);
         var name = restoredUsers[id].name;
-        $("#dialog #name").val(name);
+        $("#dialog2 #name").text(name);
         var place = restoredUsers[id].place;
-        $("#dialog #place").val(place);
+        $("#dialog2 #place").text(place);
         var gender = restoredUsers[id].gender;
-        $("#dialog #gender").val(gender);
+        $("#dialog2 #gender").text(gender);
         var zodiac = restoredUsers[id].zodiac;
-        $("#dialog #zodiac").val(zodiac);
+        $("#dialog2 #zodiac").text(zodiac);
         var note = restoredUsers[id].note;
-        $("#dialog #note").val(note);
+        $("#dialog2 #note").text(note);
     }
 
     function editRec(id) {
@@ -160,11 +169,21 @@ $(document).ready(function () {
         modal: true,
         buttons: [
             {
-                text: "Запиши",
+                text: "Създай нов",
                 icons: {
                     primary: "ui-icon-heart"
                 },
                 click: addRecord
+
+                        // Uncommenting the following line would hide the text,
+                        // resulting in the label being used as a tooltip
+            },
+            {
+                text: "Обнови",
+                icons: {
+                    primary: "ui-icon-heart"
+                },
+                click: editRec
 
                         // Uncommenting the following line would hide the text,
                         // resulting in the label being used as a tooltip
@@ -187,11 +206,16 @@ $(document).ready(function () {
         modal: true,
         buttons: [
             {
-                text: "Update Record",
+                text: "Edit Record",
                 icons: {
                     primary: "ui-icon-heart"
                 },
-                click: addRecord
+                click: function () {
+                    var id = $(this).attr("id");
+                    //$("#dialog").dialog("open");
+                    //$(this).parentsUntil("tbody").remove();
+                    editRec(id);
+                }
             },
             {
                 text: "Ok",
@@ -224,6 +248,7 @@ $(document).ready(function () {
             return true;
         }
     }
+
 
     function checkRegexp(o, regexp, n) {
         if (!(regexp.test(o.val()))) {
