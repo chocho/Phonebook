@@ -165,7 +165,7 @@ $(document).ready(function () {
     $("#dialog").dialog({
         autoOpen: false,
         height: 500,
-        width: 350,
+        width: 400,
         modal: true,
         buttons: [
             {
@@ -202,7 +202,7 @@ $(document).ready(function () {
     $("#dialog2").dialog({
         autoOpen: false,
         height: 500,
-        width: 350,
+        width: 400,
         modal: true,
         buttons: [
             {
@@ -211,12 +211,29 @@ $(document).ready(function () {
                     primary: "ui-icon-heart"
                 },
                 click: function () {
-                    var id = $(this).attr("id");
+                    var id = $("#dialog2 #phone").text();
                     //$("#dialog").dialog("open");
                     //$(this).parentsUntil("tbody").remove();
+                    $(this).dialog("close");
+                    $("#dialog").dialog("open");
                     editRec(id);
                 }
             },
+            {
+                text: "Delete Record",
+                icons: {
+                    primary: "ui-icon-heart"
+                },
+                click: function () {
+                    var id = $("#dialog2 #phone").text();
+                    //$("#dialog").dialog("open");
+                    //$(this).parentsUntil("tbody").remove();
+                    $(this).dialog("close");
+                    $("tr#"+id+"").remove();
+                    removeRec(id);            
+                    
+                }
+            },            
             {
                 text: "Ok",
                 icons: {
