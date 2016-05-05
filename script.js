@@ -1,8 +1,23 @@
 $(document).ready(function () {
-    function addRecord() {
+    function clickCounter() {
+        if (typeof (Storage) !== "undefined") {
+            if (localStorage.userId) {
+                localStorage.userId = Number(localStorage.userId) + 1;
+            } else {
+                localStorage.userId = 1;
+            }
+        }
+    }
+
+    function addRecord(id) {
+        if (id !== undefined) {
+            //  removeRec(id);
+        }
         var valid = true;
         var thisUser = {};
-        var userId = thisUser.phone = $("#phone").val();
+        //var localStorage.userId =
+        clickCounter();
+        thisUser.phone = $("#phone").val();
         var name = $("#name");
         var phone = $("#phone");
         thisUser.name = $("#name").val();
@@ -28,13 +43,13 @@ $(document).ready(function () {
                     valid = false;
                 }
             }
-            potrebiteli[userId] = thisUser;
+            potrebiteli[localStorage.userId] = thisUser;
         } else {
             var potrebiteli = {};
-            potrebiteli[userId] = thisUser;
+            potrebiteli[localStorage.userId] = thisUser;
         }
         if (valid) {
-            $("#phoneTable tbody").append("<tr class='row' id='" + userId + "'>" +
+            $("#phoneTable tbody").append("<tr class='row' id='" + localStorage.userId + "'>" +
                     "<td>" + $("#phone").val() + "</td>" +
                     "<td>" + $("#name").val() + "</td>" +
                     "<td>" + $("#place").val() + "</td>" +
@@ -46,8 +61,9 @@ $(document).ready(function () {
                     "</tr>");
             $(this).dialog("close");
             $(".trash").click(function () {
-                $("#" + userId + "").remove();
+                $("#" + localStorage.userId + "").remove();
                 ;
+                removeRec(localStorage.userId);
             });
             $(".view").on("click", function () {
                 var id = $(this).attr("id");
@@ -74,31 +90,30 @@ $(document).ready(function () {
         if (restoredUsers) {
             var userrr = {};
             for (userrr in restoredUsers) {
-                var telefon = userrr[phone];
-                $("#phoneTable tbody").append("<tr class='row' id='" + restoredUsers[userrr].phone + "'>" +
+                $("#phoneTable tbody").append("<tr class='row' id='" + userrr + "'>" +
                         "<td>" + restoredUsers[userrr].phone + "</td>" +
                         "<td>" + restoredUsers[userrr].name + "</td>" +
                         "<td>" + restoredUsers[userrr].place + "</td>" +
                         "<td>" + restoredUsers[userrr].gender + "</td>" +
                         "<td>" + restoredUsers[userrr].zodiac + "</td>" +
-                        "<td><img class='view' onclick='getElementById(\"demo\").innerHTML=Date()' id='" + restoredUsers[userrr].phone + "' src='images/view.png' width='25' height='25' alt='' />" +
-                        "<img class='edit' onclick='getElementById(\"demo\").innerHTML=Date()' id='" + restoredUsers[userrr].phone + "' src='images/edit.png' width='25' height='25' alt='' />\n\
+                        "<td><img class='view' onclick='getElementById(\"demo\").innerHTML=Date()' id='" + userrr + "' src='images/view.png' width='25' height='25' alt='' />" +
+                        "<img class='edit' onclick='getElementById(\"demo\").innerHTML=Date()' id='" + userrr + "' src='images/edit.png' width='25' height='25' alt='' />\n\
 " +
-                        "<img class='trash' onclick='getElementById(\"demo\").innerHTML=Date()' id='" + restoredUsers[userrr].phone + "' src='images/trash.png' width='25' height='25' alt='' /></td>" +
+                        "<img class='trash' onclick='getElementById(\"demo\").innerHTML=Date()' id='" + userrr + "' src='images/trash.png' width='25' height='25' alt='' /></td>" +
                         "</tr>");
                 $(".trash").on("click", function () {
-                    var id = $(this).attr("id");
+                    var id = userrr;
                     $(this).parentsUntil("tbody").remove();
                     removeRec(id);
                 });
                 $(".view").on("click", function () {
-                    var id = $(this).attr("id");
+                    var id = userrr;
                     $("#dialog2").dialog("open");
                     //$(this).parentsUntil("tbody").remove();
                     viewRec(id);
                 });
                 $(".edit").on("click", function () {
-                    var id = $(this).attr("id");
+                    var id = userrr;
                     $("#dialog").dialog("open");
                     //$(this).parentsUntil("tbody").remove();
                     editRec(id);
@@ -111,6 +126,7 @@ $(document).ready(function () {
     function viewRec(id) {
         $("#dialog2 p").css("background-color", "#000");
         var restoredUsers = JSON.parse(localStorage.getItem("users"));
+        localStorage.userId = id;
         var phone = restoredUsers[id].phone;
         $("#dialog2 #phone").text(phone);
         var name = restoredUsers[id].name;
@@ -126,8 +142,8 @@ $(document).ready(function () {
     }
 
     function editRec(id) {
-        $("#dialog input").removeAttr("disabled");
         var restoredUsers = JSON.parse(localStorage.getItem("users"));
+        localStorage.userId = id;
         var phone = restoredUsers[id].phone;
         $("#dialog #phone").val(phone);
         var name = restoredUsers[id].name;
@@ -141,6 +157,49 @@ $(document).ready(function () {
         var note = restoredUsers[id].note;
         $("#dialog #note").val(note);
     }
+    function updateRec(id) {
+        var currentID = localStorage.userId;
+        var restoredUsers = JSON.parse(localStorage.getItem("users"));
+        var phone = $("#dialog #phone").val();
+        var name = $("#dialog #name").val();
+        var place = $("#dialog #place").val();
+        var gender = $("#dialog #gender").val();
+        var zodiac = $("#dialog #zodiac").val();
+        var note = $("#dialog #note").val();
+        $("tr#" + id + "").replaceWith("<tr class='row' id='" + localStorage.userId + "'>" +
+                "<td>" + $("#phone").val() + "</td>" +
+                "<td>" + $("#name").val() + "</td>" +
+                "<td>" + $("#place").val() + "</td>" +
+                "<td>" + $("#gender").val() + "</td>" +
+                "<td>" + $("#zodiac").val() + "</td>" +
+                "<td><img  class='view' src='images/view.png' width='25' height='25' alt='' />" +
+                "<img  class='edit' src='images/edit.png' width='25' height='25' alt='' />" +
+                "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
+                "</tr>");
+        $(".trash").on("click", function () {
+            $(this).parentsUntil("tbody").remove();
+            removeRec(id);
+        });
+        $(".view").on("click", function () {
+            $("#dialog2").dialog("open");
+            //$(this).parentsUntil("tbody").remove();
+            viewRec(id);
+        });
+        $(".edit").on("click", function () {
+            $("#dialog").dialog("open");
+            //$(this).parentsUntil("tbody").remove();
+            editRec(id);
+        });
+
+        restoredUsers[id].phone = phone;
+        restoredUsers[id].name = name;
+        restoredUsers[id].place = place;
+        restoredUsers[id].gender = gender;
+        restoredUsers[id].zodiac = zodiac;
+        restoredUsers[id].note = note;
+        localStorage.setItem("users", JSON.stringify(restoredUsers));
+    }
+
     function removeRec(id) {
         var idd = id;
         var restoredUsers = JSON.parse(localStorage.getItem("users"));
@@ -155,7 +214,7 @@ $(document).ready(function () {
         $("#dialog").dialog("open");
     });
     $("#importRec").click(function () {
-        $("#dialog2").dialog("open");
+        $("#textAr").dialog("open");
     });
 
     $("#clearLS").click(function () {
@@ -183,10 +242,15 @@ $(document).ready(function () {
                 icons: {
                     primary: "ui-icon-heart"
                 },
-                click: editRec
+                click: function () {
+                    var id = localStorage.userId;
+                    $(this).dialog("close");
+                    //$("#phoneTable tr#" + id + "").remove();
+                    updateRec(id);
+                }
 
-                        // Uncommenting the following line would hide the text,
-                        // resulting in the label being used as a tooltip
+                // Uncommenting the following line would hide the text,
+                // resulting in the label being used as a tooltip
             },
             {
                 text: "Отмени",
@@ -211,9 +275,7 @@ $(document).ready(function () {
                     primary: "ui-icon-heart"
                 },
                 click: function () {
-                    var id = $("#dialog2 #phone").text();
-                    //$("#dialog").dialog("open");
-                    //$(this).parentsUntil("tbody").remove();
+                    var id = localStorage.userId;
                     $(this).dialog("close");
                     $("#dialog").dialog("open");
                     editRec(id);
@@ -225,15 +287,15 @@ $(document).ready(function () {
                     primary: "ui-icon-heart"
                 },
                 click: function () {
-                    var id = $("#dialog2 #phone").text();
+                    var id = localStorage.userId;
                     //$("#dialog").dialog("open");
                     //$(this).parentsUntil("tbody").remove();
                     $(this).dialog("close");
-                    $("tr#"+id+"").remove();
-                    removeRec(id);            
-                    
+                    $("tr#" + id + "").remove();
+                    removeRec(id);
+
                 }
-            },            
+            },
             {
                 text: "Ok",
                 icons: {
@@ -245,6 +307,24 @@ $(document).ready(function () {
             }
         ]
     });
+    
+    $("#textAr").dialog({
+        autoOpen: false,
+        height: 400,
+        width: 800,
+        modal: true,
+        buttons: [
+                        {
+                text: "Ok",
+                icons: {
+                    primary: "ui-icon-heart"
+                },
+                click: function () {
+                    $(this).dialog("close");
+                }
+            }
+        ]
+    });    
 
     function updateTips(t) {
         tips

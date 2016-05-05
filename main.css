@@ -270,14 +270,8 @@ h1{
 
 
 
-
-
-
-
-
-
-
-
-
-
-
+#textAr{
+    font-size: 0.8em;
+    overflow: scroll; 
+    overflow-x: scroll; 
+}
