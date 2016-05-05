@@ -307,14 +307,24 @@ $(document).ready(function () {
             }
         ]
     });
-    
+
     $("#textAr").dialog({
         autoOpen: false,
         height: 400,
         width: 800,
         modal: true,
         buttons: [
-                        {
+            {
+                text: "Alert",
+                icons: {
+                    primary: "ui-icon-heart"
+                },
+                click: function () {
+                   var entered =  $("#textAr").val();
+                var res = entered.match(/.+$/gm);
+                }
+            },
+            {
                 text: "Ok",
                 icons: {
                     primary: "ui-icon-heart"
@@ -324,7 +334,7 @@ $(document).ready(function () {
                 }
             }
         ]
-    });    
+    });
 
     function updateTips(t) {
         tips
