@@ -8,7 +8,38 @@ $(document).ready(function () {
             }
         }
     }
+ var entityMap = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': '&quot;',
+    "'": '&#39;',
+    "/": '&#x2F;'
+  };
 
+  function escapeHtml(string) {
+    return String(string).replace(/[&<>"'\/]/g, function (s) {
+      return entityMap[s];
+    });
+  }
+  function htmlEscape(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
+
+// I needed the opposite function today, so adding here too:
+function htmlUnescape(value){
+    return String(value)
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&');
+}
     function addRecord(id) {
         if (id !== undefined) {
             //  removeRec(id);
@@ -21,6 +52,9 @@ $(document).ready(function () {
         var name = $("#name");
         var phone = $("#phone");
         thisUser.name = $("#name").val();
+        var proba = $("#name").val();
+        var newproba = escapeHtml(proba);
+        var newproba2 = htmlEscape(proba);
         thisUser.place = $("#place").val();
         thisUser.gender = $("#gender").val();
         thisUser.zodiac = $("#zodiac").val();
