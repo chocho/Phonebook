@@ -8,38 +8,38 @@ $(document).ready(function () {
             }
         }
     }
- var entityMap = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': '&quot;',
-    "'": '&#39;',
-    "/": '&#x2F;'
-  };
+    var entityMap = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': '&quot;',
+        "'": '&#39;',
+        "/": '&#x2F;'
+    };
 
-  function escapeHtml(string) {
-    return String(string).replace(/[&<>"'\/]/g, function (s) {
-      return entityMap[s];
-    });
-  }
-  function htmlEscape(str) {
-    return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
-}
+    function escapeHtml(string) {
+        return String(string).replace(/[&<>"'\/]/g, function (s) {
+            return entityMap[s];
+        });
+    }
+    function htmlEscape(str) {
+        return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+    }
 
 // I needed the opposite function today, so adding here too:
-function htmlUnescape(value){
-    return String(value)
-        .replace(/&quot;/g, '"')
-        .replace(/&#39;/g, "'")
-        .replace(/&lt;/g, '<')
-        .replace(/&gt;/g, '>')
-        .replace(/&amp;/g, '&');
-}
+    function htmlUnescape(value) {
+        return String(value)
+                .replace(/&quot;/g, '"')
+                .replace(/&#39;/g, "'")
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>')
+                .replace(/&amp;/g, '&');
+    }
     function addRecord(id) {
         if (id !== undefined) {
             //  removeRec(id);
@@ -354,8 +354,61 @@ function htmlUnescape(value){
                     primary: "ui-icon-heart"
                 },
                 click: function () {
-                   var entered =  $("#textAr").val();
-                var res = entered.match(/.+$/gm);
+                    var entered = $("#textAr").val();
+                    var res = entered.match(/.+$/gm);
+                    var potrebiteli2 = {};
+                    var potrebiteli = JSON.parse(localStorage.getItem("users"));
+                    if (!potrebiteli) {
+                        var potrebiteli = {};
+                    }
+                    var fLen = res.length;
+                    var c = 0;
+                    //var thisUser = {};
+                    //var potrebiteli = JSON.parse(localStorage.getItem("users"));
+                    for (c = 0; c < fLen; c++) {
+                        var thisUser = {};
+                        var user = res[c].split("\t");
+                        thisUser.phone = user[0];
+                        thisUser.name = user[1];
+                        thisUser.place = user[2];
+                        thisUser.gender = user[3];
+                        thisUser.zodiac = user[4];
+                        thisUser.note = user[5];
+                        clickCounter();
+                        $("#phoneTable tbody").append("<tr class='row' id='" + localStorage.userId + "'>" +
+                                "<td>" + thisUser.phone + "</td>" +
+                                "<td>" + thisUser.name + "</td>" +
+                                "<td>" + thisUser.place + "</td>" +
+                                "<td>" + thisUser.gender + "</td>" +
+                                "<td>" + thisUser.zodiac + "</td>" +
+                                "<td><img  class='view' src='images/view.png' width='25' height='25' alt='' />" +
+                                "<img  class='edit' src='images/edit.png' width='25' height='25' alt='' />" +
+                                "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
+                                "</tr>");
+
+                        $(".trash").click(function () {
+                            $("#" + localStorage.userId + "").remove();
+                            ;
+                            removeRec(localStorage.userId);
+                        });
+                        $(".view").on("click", function () {
+                            var id = $(this).attr("id");
+                            $("#dialog").dialog("open");
+                            //$(this).parentsUntil("tbody").remove();
+                            viewRec(id);
+                        });
+                        $(".edit").on("click", function () {
+                            var id = $(this).attr("id");
+                            $("#dialog").dialog("open");
+                            //$(this).parentsUntil("tbody").remove();
+                            editRec(id);
+                        });
+                        potrebiteli[localStorage.userId] = thisUser;
+
+                    }
+
+                    localStorage.setItem("users", JSON.stringify(potrebiteli));
+                    $(this).dialog("close");
                 }
             },
             {
