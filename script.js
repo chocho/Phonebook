@@ -6,22 +6,10 @@ $(document).ready(function () {
             } else {
                 localStorage.userId = 1;
             }
+            return localStorage.userId;
         }
     }
-    var entityMap = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': '&quot;',
-        "'": '&#39;',
-        "/": '&#x2F;'
-    };
 
-    function escapeHtml(string) {
-        return String(string).replace(/[&<>"'\/]/g, function (s) {
-            return entityMap[s];
-        });
-    }
     function htmlEscape(str) {
         return String(str)
                 .replace(/&/g, '&amp;')
@@ -40,30 +28,58 @@ $(document).ready(function () {
                 .replace(/&gt;/g, '>')
                 .replace(/&amp;/g, '&');
     }
-    function addRecord(id) {
-        if (id !== undefined) {
-            //  removeRec(id);
-        }
+
+    function viewEvent() {
+        $(".view").click(function () {
+            var id = $(this).parents("tr").attr("id");
+            $("#dialog2").dialog("open");
+            viewRec(id);
+        });
+    }
+
+    function editEvent() {
+        $(".edit").click(function () {
+            //var id = $(this).attr("id");
+            var id = $(this).parents("tr").attr("id");
+            $("#dialog").dialog("open");
+            editRec(id);
+        });
+    }
+
+    function trashEvent() {
+        $(".trash").click(function () {
+            var id = $(this).parents("tr").attr("id");
+            $("#" + id + "").remove();
+            removeRec(id);
+        });
+    }
+
+    function addRecord() {
+
         var valid = true;
         var thisUser = {};
-        //var localStorage.userId =
-        clickCounter();
         thisUser.phone = $("#phone").val();
         var name = $("#name");
         var phone = $("#phone");
+        var place = $("#place");
+        var gender = $("#gender");
+        var note = $("#note");
         thisUser.name = $("#name").val();
         var proba = $("#name").val();
-        var newproba = escapeHtml(proba);
         var newproba2 = htmlEscape(proba);
         thisUser.place = $("#place").val();
         thisUser.gender = $("#gender").val();
         thisUser.zodiac = $("#zodiac").val();
         thisUser.note = $("#note").val();
         valid = valid && checkLength(phone, "phone number", 5, 12);
-        valid = valid && checkRegexp(phone, /[0-9]/, "Phone number may consist of +, 0-9");
-        valid = valid && checkLength(name, "името", 5, 12);
-        valid = valid && checkRegexp(name, /^[a-z]([0-9a-z_\s])+$/i, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter.");
+        valid = valid && checkRegexp(phone, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
+        valid = valid && checkLength(name, "името", 1, 30);
+        valid = valid && checkLength(place, "населено място", 0, 30);
+        valid = valid && checkRegexp(gender, /[мж]{1}/, "Моля, изберете пол.");
+        valid = valid && checkLength(note, "населено място", 0, 500);
+        //valid = valid && checkRegexp(name, /.+/, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter.");
         var userrr = {};
+
         var potrebiteli = JSON.parse(localStorage.getItem("users"));
         if (valid && potrebiteli) {
             for (userrr in potrebiteli) {
@@ -77,12 +93,12 @@ $(document).ready(function () {
                     valid = false;
                 }
             }
-            potrebiteli[localStorage.userId] = thisUser;
         } else {
             var potrebiteli = {};
-            potrebiteli[localStorage.userId] = thisUser;
         }
         if (valid) {
+            var locid = clickCounter();
+            potrebiteli[localStorage.userId] = thisUser;
             $("#phoneTable tbody").append("<tr class='row' id='" + localStorage.userId + "'>" +
                     "<td>" + $("#phone").val() + "</td>" +
                     "<td>" + $("#name").val() + "</td>" +
@@ -94,27 +110,13 @@ $(document).ready(function () {
                     "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
                     "</tr>");
             $(this).dialog("close");
-            $(".trash").click(function () {
-                $("#" + localStorage.userId + "").remove();
-                ;
-                removeRec(localStorage.userId);
-            });
-            $(".view").on("click", function () {
-                var id = $(this).attr("id");
-                $("#dialog").dialog("open");
-                //$(this).parentsUntil("tbody").remove();
-                viewRec(id);
-            });
-            $(".edit").on("click", function () {
-                var id = $(this).attr("id");
-                $("#dialog").dialog("open");
-                //$(this).parentsUntil("tbody").remove();
-                editRec(id);
-            });
+            viewEvent();
+            editEvent();
+            trashEvent();
             localStorage.setItem("users", JSON.stringify(potrebiteli));
-            //listRecords();
         }
-        return valid;
+        //return valid;
+        //location.reload();
 
     }
     ;
@@ -135,23 +137,10 @@ $(document).ready(function () {
 " +
                         "<img class='trash' onclick='getElementById(\"demo\").innerHTML=Date()' id='" + userrr + "' src='images/trash.png' width='25' height='25' alt='' /></td>" +
                         "</tr>");
-                $(".trash").on("click", function () {
-                    var id = userrr;
-                    $(this).parentsUntil("tbody").remove();
-                    removeRec(id);
-                });
-                $(".view").on("click", function () {
-                    var id = userrr;
-                    $("#dialog2").dialog("open");
-                    //$(this).parentsUntil("tbody").remove();
-                    viewRec(id);
-                });
-                $(".edit").on("click", function () {
-                    var id = userrr;
-                    $("#dialog").dialog("open");
-                    //$(this).parentsUntil("tbody").remove();
-                    editRec(id);
-                });
+
+                viewEvent();
+                editEvent();
+                trashEvent();
             }
         }
         ;
@@ -160,7 +149,7 @@ $(document).ready(function () {
     function viewRec(id) {
         $("#dialog2 p").css("background-color", "#000");
         var restoredUsers = JSON.parse(localStorage.getItem("users"));
-        localStorage.userId = id;
+        localStorage.currentId = id;
         var phone = restoredUsers[id].phone;
         $("#dialog2 #phone").text(phone);
         var name = restoredUsers[id].name;
@@ -177,7 +166,7 @@ $(document).ready(function () {
 
     function editRec(id) {
         var restoredUsers = JSON.parse(localStorage.getItem("users"));
-        localStorage.userId = id;
+        localStorage.currentId = id;
         var phone = restoredUsers[id].phone;
         $("#dialog #phone").val(phone);
         var name = restoredUsers[id].name;
@@ -195,43 +184,73 @@ $(document).ready(function () {
         var currentID = localStorage.userId;
         var restoredUsers = JSON.parse(localStorage.getItem("users"));
         var phone = $("#dialog #phone").val();
+        var phone2 = $("#dialog #phone");
+        var name2 = $("#dialog #name");
+        var place2 = $("#dialog #place");
+        var gender2 = $("#dialog #gender");
+        var note2 = $("#dialog #note");
+        var valid = true;
+        valid = valid && checkLength(phone2, "phone number", 5, 12);
+        valid = valid && checkRegexp(phone2, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
+        valid = valid && checkLength(name2, "името", 1, 30);
+        valid = valid && checkLength(place2, "населено място", 0, 30);
+        valid = valid && checkRegexp(gender2, /[мж]{1}/, "Моля, изберете пол.");
+        valid = valid && checkLength(note2, "населено място", 0, 500);
+
+        var userrr = {};
+        var potrebiteli = JSON.parse(localStorage.getItem("users"));
+        if (valid && potrebiteli) {
+            for (userrr in potrebiteli) {
+                if (userrr === id) {
+                    continue;
+                }
+                var currentPhone = potrebiteli[userrr].phone;
+                var currentName = potrebiteli[userrr].name;
+                if (currentPhone === phone) {
+                    tips.text("Телефонът вече съществува");
+                    valid = false;
+                } else if (currentName === name2.val()) {
+                    tips.text("Името вече съществува");
+                    valid = false;
+                }
+            }
+        } else {
+            var potrebiteli = {};
+        }
+
         var name = $("#dialog #name").val();
         var place = $("#dialog #place").val();
         var gender = $("#dialog #gender").val();
         var zodiac = $("#dialog #zodiac").val();
         var note = $("#dialog #note").val();
-        $("tr#" + id + "").replaceWith("<tr class='row' id='" + localStorage.userId + "'>" +
-                "<td>" + $("#phone").val() + "</td>" +
-                "<td>" + $("#name").val() + "</td>" +
-                "<td>" + $("#place").val() + "</td>" +
-                "<td>" + $("#gender").val() + "</td>" +
-                "<td>" + $("#zodiac").val() + "</td>" +
-                "<td><img  class='view' src='images/view.png' width='25' height='25' alt='' />" +
-                "<img  class='edit' src='images/edit.png' width='25' height='25' alt='' />" +
-                "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
-                "</tr>");
-        $(".trash").on("click", function () {
-            $(this).parentsUntil("tbody").remove();
-            removeRec(id);
-        });
-        $(".view").on("click", function () {
-            $("#dialog2").dialog("open");
-            //$(this).parentsUntil("tbody").remove();
-            viewRec(id);
-        });
-        $(".edit").on("click", function () {
-            $("#dialog").dialog("open");
-            //$(this).parentsUntil("tbody").remove();
-            editRec(id);
-        });
+        if (valid) {
+            $("tr#" + id + "").replaceWith("<tr class='row' id='" + id + "'>" +
+                    "<td>" + $("#phone").val() + "</td>" +
+                    "<td>" + $("#name").val() + "</td>" +
+                    "<td>" + $("#place").val() + "</td>" +
+                    "<td>" + $("#gender").val() + "</td>" +
+                    "<td>" + $("#zodiac").val() + "</td>" +
+                    "<td><img  class='view' src='images/view.png' width='25' height='25' alt='' />" +
+                    "<img  class='edit' src='images/edit.png' width='25' height='25' alt='' />" +
+                    "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
+                    "</tr>");
+            viewEvent();
+            editEvent();
+            trashEvent();
 
-        restoredUsers[id].phone = phone;
-        restoredUsers[id].name = name;
-        restoredUsers[id].place = place;
-        restoredUsers[id].gender = gender;
-        restoredUsers[id].zodiac = zodiac;
-        restoredUsers[id].note = note;
-        localStorage.setItem("users", JSON.stringify(restoredUsers));
+            restoredUsers[id].phone = phone;
+            restoredUsers[id].name = name;
+            restoredUsers[id].place = place;
+            restoredUsers[id].gender = gender;
+            restoredUsers[id].zodiac = zodiac;
+            restoredUsers[id].note = note;
+            localStorage.setItem("users", JSON.stringify(restoredUsers));
+            return true;
+
+        } else {
+            return false;
+        }
+        //location.reload();
     }
 
     function removeRec(id) {
@@ -277,10 +296,12 @@ $(document).ready(function () {
                     primary: "ui-icon-heart"
                 },
                 click: function () {
-                    var id = localStorage.userId;
-                    $(this).dialog("close");
+                    var id = localStorage.currentId;
                     //$("#phoneTable tr#" + id + "").remove();
-                    updateRec(id);
+                    var valid = updateRec(id);
+                    if (valid) {
+                        $(this).dialog("close");
+                    }
                 }
 
                 // Uncommenting the following line would hide the text,
@@ -309,7 +330,7 @@ $(document).ready(function () {
                     primary: "ui-icon-heart"
                 },
                 click: function () {
-                    var id = localStorage.userId;
+                    var id = localStorage.currentId;
                     $(this).dialog("close");
                     $("#dialog").dialog("open");
                     editRec(id);
@@ -349,7 +370,7 @@ $(document).ready(function () {
         modal: true,
         buttons: [
             {
-                text: "Alert",
+                text: "Запиши",
                 icons: {
                     primary: "ui-icon-heart"
                 },
@@ -374,45 +395,41 @@ $(document).ready(function () {
                         thisUser.gender = user[3];
                         thisUser.zodiac = user[4];
                         thisUser.note = user[5];
-                        clickCounter();
-                        $("#phoneTable tbody").append("<tr class='row' id='" + localStorage.userId + "'>" +
-                                "<td>" + thisUser.phone + "</td>" +
-                                "<td>" + thisUser.name + "</td>" +
-                                "<td>" + thisUser.place + "</td>" +
-                                "<td>" + thisUser.gender + "</td>" +
-                                "<td>" + thisUser.zodiac + "</td>" +
-                                "<td><img  class='view' src='images/view.png' width='25' height='25' alt='' />" +
-                                "<img  class='edit' src='images/edit.png' width='25' height='25' alt='' />" +
-                                "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
-                                "</tr>");
 
-                        $(".trash").click(function () {
-                            $("#" + localStorage.userId + "").remove();
-                            ;
-                            removeRec(localStorage.userId);
-                        });
-                        $(".view").on("click", function () {
-                            var id = $(this).attr("id");
-                            $("#dialog").dialog("open");
-                            //$(this).parentsUntil("tbody").remove();
-                            viewRec(id);
-                        });
-                        $(".edit").on("click", function () {
-                            var id = $(this).attr("id");
-                            $("#dialog").dialog("open");
-                            //$(this).parentsUntil("tbody").remove();
-                            editRec(id);
-                        });
-                        potrebiteli[localStorage.userId] = thisUser;
+                        var valid = true;
+                        valid = valid && checkLength(phone, "phone number", 5, 12);
+                        valid = valid && checkRegexp(phone, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
 
+                        if (valid) {
+                            clickCounter();
+                            var id = localStorage.userId;
+                            $("#phoneTable tbody").append("<tr class='row' id='" + localStorage.userId + "'>" +
+                                    "<td>" + thisUser.phone + "</td>" +
+                                    "<td>" + thisUser.name + "</td>" +
+                                    "<td>" + thisUser.place + "</td>" +
+                                    "<td>" + thisUser.gender + "</td>" +
+                                    "<td>" + thisUser.zodiac + "</td>" +
+                                    "<td><img  class='view' src='images/view.png' width='25' height='25' alt='' />" +
+                                    "<img  class='edit' src='images/edit.png' width='25' height='25' alt='' />" +
+                                    "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
+                                    "</tr>");
+
+                            potrebiteli[localStorage.userId] = thisUser;
+
+                            viewEvent();
+                            editEvent();
+                            trashEvent();
+                        }
+                        else{
+                            alert(222222222);
+                        }
                     }
-
                     localStorage.setItem("users", JSON.stringify(potrebiteli));
                     $(this).dialog("close");
                 }
             },
             {
-                text: "Ok",
+                text: "Отмени",
                 icons: {
                     primary: "ui-icon-heart"
                 },

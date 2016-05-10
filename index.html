@@ -39,23 +39,41 @@
         <div class="main">
             <section class="">
                 <h3 class="highlight">Телефонен указател</h3>
-                <div id="dialog" title="Create new user">
-                    <p class="validateTips">All form fields are required.</p>
+                <div id="dialog" title="Създай нов потребител">
+                    <p class="validateTips">Полетата със звезда са задължителни</p>
 
                     <form>
                         <fieldset>
                             <input type="hidden" id="userID" />
-                            <label for="name">Phone</label>
+                            <label for="name">Телефон *</label>
                             <input type="text" name="phone" id="phone" value="" class="text ui-widget-content ui-corner-all">
-                            <label for="name">Name</label>
+                            <label for="name">Име *</label>
                             <input type="text" name="name" id="name" value="" class="text ui-widget-content ui-corner-all">
-                            <label for="place">Place</label>
+                            <label for="place">Населено място</label>
                             <input type="text" name="place" id="place" value="" class="text ui-widget-content ui-corner-all">
-                            <label for="name">Gender</label>
-                            <input type="text" name="gender" id="gender" value="" class="text ui-widget-content ui-corner-all">
-                            <label for="zodiac">Zodiac</label>
-                            <input type="text" name="zodiac" id="zodiac" value="" class="text ui-widget-content ui-corner-all">
-                            <label for="zodiac">Note</label>
+                            <label for="name">Пол *</label>
+                            <select id="gender">
+                                <option value=""></option>
+                                <option value="м">м</option>
+                                <option value="ж">ж</option>
+                            </select>
+                            <label for="zodiac">Зодия</label>
+                            <select id="zodiac">
+                                <option value=""></option>
+                                <option value="аries">Овен</option>
+                                <option value="taurus">Телец</option>
+                                <option value="gemini">Близнаци</option>
+                                <option value="cancer">Рак</option>
+                                <option value="leo">Лъв</option>
+                                <option value="virgo">Дева</option>
+                                <option value="libra">Везни</option>
+                                <option value="scorpio">Скорпион</option>
+                                <option value="sagittarius">Стрелец</option>
+                                <option value="capricorn">Козирог</option>
+                                <option value="aquarius">Водолей</option>
+                                <option value="pisces">Риби</option>
+                            </select>
+                            <label for="note">Бележки</label>
                             <input type="text" name="note" id="note" value="" class="text ui-widget-content ui-corner-all">     
                             <!-- Allow form submission with keyboard without duplicating the dialog button -->
                             <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
@@ -63,44 +81,44 @@
                     </form>
                 </div>
                 <div id="dialog2" title="View user">
-                            <label for="name">Phone</label>
-                            <p  id="phone"  class="text ui-widget-content ui-corner-all"></p>
-                            <label for="name">Name</label>
-                            <p  id="name"  class="text ui-widget-content ui-corner-all"></p>
-                            <label for="place">Place</label>
-                            <p id="place"  class="text ui-widget-content ui-corner-all "></p>
-                            <label for="name">Gender</label>
-                            <p id="gender"  class="text ui-widget-content ui-corner-all"></p>
-                            <label for="zodiac">Zodiac</label>
-                            <p id="zodiac"  class="text ui-widget-content ui-corner-all"></p>
-                            <label for="zodiac">Note</label>
-                            <p  id="note"  class="text ui-widget-content ui-corner-all"> </p>
-                            <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
+                    <label for="name">Phone</label>
+                    <p  id="phone"  class="text ui-widget-content ui-corner-all"></p>
+                    <label for="name">Name</label>
+                    <p  id="name"  class="text ui-widget-content ui-corner-all"></p>
+                    <label for="place">Place</label>
+                    <p id="place"  class="text ui-widget-content ui-corner-all "></p>
+                    <label for="name">Gender</label>
+                    <p id="gender"  class="text ui-widget-content ui-corner-all"></p>
+                    <label for="zodiac">Zodiac</label>
+                    <p id="zodiac"  class="text ui-widget-content ui-corner-all"></p>
+                    <label for="zodiac">Note</label>
+                    <p  id="note"  class="text ui-widget-content ui-corner-all"> </p>
+                    <input type="submit" tabindex="-1" style="position:absolute; top:-1000px">
                 </div>
                 <div><textarea id="textAr" rows="24" cols="100" autofocus></textarea></div>
                 <div class="table-responsive"> 
                     <table id="phoneTable" class="table table-striped row">
                         <tbody>
-                        <tr class="row">
-                            <th class="col-md-1">Phone</th>
-                            <th class="col-md-1">Name</th>
-                            <th class="col-md-1">Place</th>
-                            <th class="col-md-1">Gender</th>
-                            <th class="col-md-1">Zodiac</th>
-                            <th class="col-md-2">Add/Edit/Delete</th>       
-                        </tr>
-                        <tr class="row">
-                            <td><a href="http://www.electro-uslugi.com" target="_blank">0888708305</a></td>
-                            <td>Chocho</td>
-                            <td>Sofia</td>
-                            <td>m</td>
-                            <td>lion</td>
-                            <td>
-                                <img src="images/view.png" width="25" height="25" alt="" />
-                                <img src="images/edit.png" width="25" height="25" alt="" />
-                                <img src="images/trash.png" width="25" height="25" alt="" />
-                            </td>
-                        </tr>
+                            <tr class="row">
+                                <th class="col-md-1">Телефон</th>
+                                <th class="col-md-1">Име</th>
+                                <th class="col-md-1">Населено място</th>
+                                <th class="col-md-1">Пол</th>
+                                <th class="col-md-1">Зодия</th>
+                                <th class="col-md-2">Виж/Редактирай/Изтрий</th>       
+                            </tr>
+                            <tr class="row">
+                                <td><a href="http://www.electro-uslugi.com" target="_blank">0888708305</a></td>
+                                <td>Chocho</td>
+                                <td>Sofia</td>
+                                <td>m</td>
+                                <td>lion</td>
+                                <td>
+                                    <img src="images/view.png" width="25" height="25" alt="" />
+                                    <img src="images/edit.png" width="25" height="25" alt="" />
+                                    <img src="images/trash.png" width="25" height="25" alt="" />
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>
