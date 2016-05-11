@@ -58,25 +58,24 @@ $(document).ready(function () {
 
         var valid = true;
         var thisUser = {};
-        thisUser.phone = $("#phone").val();
-        var name = $("#name");
-        var phone = $("#phone");
-        var place = $("#place");
-        var gender = $("#gender");
-        var note = $("#note");
-        thisUser.name = $("#name").val();
-        var proba = $("#name").val();
-        var newproba2 = htmlEscape(proba);
-        thisUser.place = $("#place").val();
-        thisUser.gender = $("#gender").val();
-        thisUser.zodiac = $("#zodiac").val();
-        thisUser.note = $("#note").val();
-        valid = valid && checkLength(phone, "phone number", 5, 12);
-        valid = valid && checkRegexp(phone, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
-        valid = valid && checkLength(name, "името", 1, 30);
-        valid = valid && checkLength(place, "населено място", 0, 30);
-        valid = valid && checkRegexp(gender, /[мж]{1}/, "Моля, изберете пол.");
-        valid = valid && checkLength(note, "населено място", 0, 500);
+        thisUser.phone = htmlEscape($("#phone").val());
+        thisUser.name = htmlEscape($("#name").val());
+        thisUser.place = htmlEscape($("#place").val());
+        thisUser.gender = htmlEscape($("#gender").val());
+        thisUser.zodiac = htmlEscape($("#zodiac").val());
+        thisUser.note = htmlEscape($("#note").val());
+        var char = "";
+        for (char in thisUser) {
+            if (char === undefined) {
+                char = "";
+            }
+        }
+        valid = valid && checkLength(thisUser.phone, "phone number", 5, 12);
+        valid = valid && checkRegexp(thisUser.phone, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
+        valid = valid && checkLength(thisUser.name, "името", 1, 30);
+        valid = valid && checkLength(thisUser.place, "населено място", 0, 30);
+        valid = valid && checkRegexp(thisUser.gender, /[мж]{1}/, "Моля, изберете пол.");
+        valid = valid && checkLength(thisUser.note, "населено място", 0, 500);
         //valid = valid && checkRegexp(name, /.+/, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter.");
         var userrr = {};
 
@@ -100,11 +99,11 @@ $(document).ready(function () {
             var locid = clickCounter();
             potrebiteli[localStorage.userId] = thisUser;
             $("#phoneTable tbody").append("<tr class='row' id='" + localStorage.userId + "'>" +
-                    "<td>" + $("#phone").val() + "</td>" +
-                    "<td>" + $("#name").val() + "</td>" +
-                    "<td>" + $("#place").val() + "</td>" +
-                    "<td>" + $("#gender").val() + "</td>" +
-                    "<td>" + $("#zodiac").val() + "</td>" +
+                    "<td>" + thisUser.phone + "</td>" +
+                    "<td>" + thisUser.name + "</td>" +
+                    "<td>" + thisUser.place + "</td>" +
+                    "<td>" + thisUser.gender + "</td>" +
+                    "<td>" + thisUser.zodiac + "</td>" +
                     "<td><img  class='view' src='images/view.png' width='25' height='25' alt='' />" +
                     "<img  class='edit' src='images/edit.png' width='25' height='25' alt='' />" +
                     "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
@@ -165,71 +164,66 @@ $(document).ready(function () {
     }
 
     function editRec(id) {
-        var restoredUsers = JSON.parse(localStorage.getItem("users"));
+        var allUsers = JSON.parse(localStorage.getItem("users"));
         localStorage.currentId = id;
-        var phone = restoredUsers[id].phone;
+        var phone = allUsers[id].phone;
         $("#dialog #phone").val(phone);
-        var name = restoredUsers[id].name;
+        var name = htmlUnescape(allUsers[id].name);
         $("#dialog #name").val(name);
-        var place = restoredUsers[id].place;
+        var place = allUsers[id].place;
         $("#dialog #place").val(place);
-        var gender = restoredUsers[id].gender;
+        var gender = allUsers[id].gender;
         $("#dialog #gender").val(gender);
-        var zodiac = restoredUsers[id].zodiac;
+        var zodiac = allUsers[id].zodiac;
         $("#dialog #zodiac").val(zodiac);
-        var note = restoredUsers[id].note;
+        var note = allUsers[id].note;
         $("#dialog #note").val(note);
     }
     function updateRec(id) {
-        var currentID = localStorage.userId;
-        var restoredUsers = JSON.parse(localStorage.getItem("users"));
-        var phone = $("#dialog #phone").val();
-        var phone2 = $("#dialog #phone");
-        var name2 = $("#dialog #name");
-        var place2 = $("#dialog #place");
-        var gender2 = $("#dialog #gender");
-        var note2 = $("#dialog #note");
+        var thisUser = {};
+        thisUser.phone = htmlEscape($("#dialog #phone").val());
+        thisUser.name = htmlEscape($("#dialog #name").val());
+        thisUser.place = htmlEscape($("#dialog #place").val());
+        thisUser.gender = htmlEscape($("#dialog #gender").val());
+        thisUser.zodiac = htmlEscape($("#dialog #zodiac").val());
+        thisUser.note = htmlEscape($("#dialog #note").val());
+
         var valid = true;
-        valid = valid && checkLength(phone2, "phone number", 5, 12);
-        valid = valid && checkRegexp(phone2, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
-        valid = valid && checkLength(name2, "името", 1, 30);
-        valid = valid && checkLength(place2, "населено място", 0, 30);
-        valid = valid && checkRegexp(gender2, /[мж]{1}/, "Моля, изберете пол.");
-        valid = valid && checkLength(note2, "населено място", 0, 500);
+        valid = valid && checkLength(thisUser.phone, "phone number", 5, 12);
+        valid = valid && checkRegexp(thisUser.phone, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
+        valid = valid && checkLength(thisUser.name, "името", 1, 30);
+        valid = valid && checkLength(thisUser.place, "населено място", 0, 30);
+        valid = valid && checkRegexp(thisUser.gender, /[мж]{1}/, "Моля, изберете пол.");
+        valid = valid && checkLength(thisUser.note, "населено място", 0, 500);
 
         var userrr = {};
-        var potrebiteli = JSON.parse(localStorage.getItem("users"));
-        if (valid && potrebiteli) {
-            for (userrr in potrebiteli) {
+        var allUsers = JSON.parse(localStorage.getItem("users"));
+        if (valid && allUsers) {
+            for (userrr in allUsers) {
                 if (userrr === id) {
                     continue;
                 }
-                var currentPhone = potrebiteli[userrr].phone;
-                var currentName = potrebiteli[userrr].name;
-                if (currentPhone === phone) {
+                var currentPhone = allUsers[userrr].phone;
+                var currentName = allUsers[userrr].name;
+                if (currentPhone === thisUser.phone) {
                     tips.text("Телефонът вече съществува");
                     valid = false;
-                } else if (currentName === name2.val()) {
+                } else if (currentName === thisUser.name) {
                     tips.text("Името вече съществува");
                     valid = false;
                 }
             }
         } else {
-            var potrebiteli = {};
+            var allUsers = {};
         }
 
-        var name = $("#dialog #name").val();
-        var place = $("#dialog #place").val();
-        var gender = $("#dialog #gender").val();
-        var zodiac = $("#dialog #zodiac").val();
-        var note = $("#dialog #note").val();
         if (valid) {
             $("tr#" + id + "").replaceWith("<tr class='row' id='" + id + "'>" +
-                    "<td>" + $("#phone").val() + "</td>" +
-                    "<td>" + $("#name").val() + "</td>" +
-                    "<td>" + $("#place").val() + "</td>" +
-                    "<td>" + $("#gender").val() + "</td>" +
-                    "<td>" + $("#zodiac").val() + "</td>" +
+                    "<td>" + thisUser.phone + "</td>" +
+                    "<td>" + thisUser.name + "</td>" +
+                    "<td>" + thisUser.place + "</td>" +
+                    "<td>" + thisUser.gender + "</td>" +
+                    "<td>" + thisUser.zodiac + "</td>" +
                     "<td><img  class='view' src='images/view.png' width='25' height='25' alt='' />" +
                     "<img  class='edit' src='images/edit.png' width='25' height='25' alt='' />" +
                     "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
@@ -238,13 +232,8 @@ $(document).ready(function () {
             editEvent();
             trashEvent();
 
-            restoredUsers[id].phone = phone;
-            restoredUsers[id].name = name;
-            restoredUsers[id].place = place;
-            restoredUsers[id].gender = gender;
-            restoredUsers[id].zodiac = zodiac;
-            restoredUsers[id].note = note;
-            localStorage.setItem("users", JSON.stringify(restoredUsers));
+            allUsers[id] = thisUser;
+            localStorage.setItem("users", JSON.stringify(allUsers));
             return true;
 
         } else {
@@ -254,11 +243,9 @@ $(document).ready(function () {
     }
 
     function removeRec(id) {
-        var idd = id;
-        var restoredUsers = JSON.parse(localStorage.getItem("users"));
-        delete restoredUsers[id];
-        //localStorage.removeItem(restoredUsers[id]);
-        localStorage.setItem("users", JSON.stringify(restoredUsers));
+        var allUsers = JSON.parse(localStorage.getItem("users"));
+        delete allUsers[id];
+        localStorage.setItem("users", JSON.stringify(allUsers));
     }
 
     $("#dialog").dialog({autoOpen: false});
@@ -267,7 +254,7 @@ $(document).ready(function () {
         $("#dialog").dialog("open");
     });
     $("#importRec").click(function () {
-        $("#textAr").dialog("open");
+        $("#importDiv").dialog("open");
     });
 
     $("#clearLS").click(function () {
@@ -286,9 +273,6 @@ $(document).ready(function () {
                     primary: "ui-icon-heart"
                 },
                 click: addRecord
-
-                        // Uncommenting the following line would hide the text,
-                        // resulting in the label being used as a tooltip
             },
             {
                 text: "Обнови",
@@ -303,9 +287,6 @@ $(document).ready(function () {
                         $(this).dialog("close");
                     }
                 }
-
-                // Uncommenting the following line would hide the text,
-                // resulting in the label being used as a tooltip
             },
             {
                 text: "Отмени",
@@ -343,12 +324,9 @@ $(document).ready(function () {
                 },
                 click: function () {
                     var id = localStorage.userId;
-                    //$("#dialog").dialog("open");
-                    //$(this).parentsUntil("tbody").remove();
                     $(this).dialog("close");
                     $("tr#" + id + "").remove();
                     removeRec(id);
-
                 }
             },
             {
@@ -363,7 +341,7 @@ $(document).ready(function () {
         ]
     });
 
-    $("#textAr").dialog({
+    $("#importDiv").dialog({
         autoOpen: false,
         height: 400,
         width: 800,
@@ -375,34 +353,81 @@ $(document).ready(function () {
                     primary: "ui-icon-heart"
                 },
                 click: function () {
+                    var valid = true;
                     var entered = $("#textAr").val();
+                    if (!entered) {
+                        tips.text("Моля, въведете данни.");
+
+                        return valid = false;
+                    }
                     var res = entered.match(/.+$/gm);
-                    var potrebiteli2 = {};
-                    var potrebiteli = JSON.parse(localStorage.getItem("users"));
-                    if (!potrebiteli) {
-                        var potrebiteli = {};
+
+                    var allUsers = JSON.parse(localStorage.getItem("users"));
+                    if (!allUsers) {
+                        var allUsers = {};
                     }
                     var fLen = res.length;
                     var c = 0;
-                    //var thisUser = {};
-                    //var potrebiteli = JSON.parse(localStorage.getItem("users"));
                     for (c = 0; c < fLen; c++) {
                         var thisUser = {};
                         var user = res[c].split("\t");
-                        thisUser.phone = user[0];
-                        thisUser.name = user[1];
-                        thisUser.place = user[2];
-                        thisUser.gender = user[3];
-                        thisUser.zodiac = user[4];
-                        thisUser.note = user[5];
 
-                        var valid = true;
-                        valid = valid && checkLength(phone, "phone number", 5, 12);
-                        valid = valid && checkRegexp(phone, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
+                        if (user[0]) {
+                            thisUser.phone = user[0];
+                        } else {
+                            thisUser.phone = "";
+                        }
+                        if (user[1]) {
+                            thisUser.name = user[1];
+                        } else {
+                            thisUser.name = "";
+                        }
+                        if (user[2]) {
+                            thisUser.place = user[2];
+                        } else {
+                            thisUser.place = "";
+                        }
+                        if (user[3]) {
+                            thisUser.gender = user[3];
+                        } else {
+                            thisUser.gender = "";
+                        }
+                        if (user[4]) {
+                            thisUser.zodiac = user[4];
+                        } else {
+                            thisUser.zodiac = "";
+                        }
+                        if (user[5]) {
+                            thisUser.note = user[5];
+                        } else {
+                            thisUser.note = "";
+                        }
 
+                        valid = valid && checkLength(thisUser.phone, "phone number", 5, 12);
+                        valid = valid && checkRegexp(thisUser.phone, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
+                        valid = valid && checkLength(thisUser.name, "името", 1, 30);
+                        valid = valid && checkLength(thisUser.place, "населено място", 0, 30);
+                        valid = valid && checkRegexp(thisUser.gender, /[мж]{1}/, "Моля, изберете пол.");
+                        valid = valid && checkLength(thisUser.note, "населено място", 0, 500);
+
+                        var userrr = {};
+                        if (valid && allUsers) {
+                            for (userrr in allUsers) {
+                                var currentPhone = allUsers[userrr].phone;
+                                var currentName = allUsers[userrr].name;
+                                if (currentPhone === thisUser.phone) {
+                                    tips.text(currentPhone + " вече съществува.");
+                                    valid = false;
+                                } else if (currentName === thisUser.name) {
+                                    tips.text("Вече съществува това име: " + currentName);
+                                    valid = false;
+                                }
+                            }
+                        } else {
+                            var allUsers = {};
+                        }
                         if (valid) {
                             clickCounter();
-                            var id = localStorage.userId;
                             $("#phoneTable tbody").append("<tr class='row' id='" + localStorage.userId + "'>" +
                                     "<td>" + thisUser.phone + "</td>" +
                                     "<td>" + thisUser.name + "</td>" +
@@ -414,17 +439,18 @@ $(document).ready(function () {
                                     "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
                                     "</tr>");
 
-                            potrebiteli[localStorage.userId] = thisUser;
+                            allUsers[localStorage.userId] = thisUser;
 
                             viewEvent();
                             editEvent();
                             trashEvent();
-                        }
-                        else{
-                            alert(222222222);
+                            localStorage.setItem("users", JSON.stringify(allUsers));
+
+                        } else {
+                            return false;
                         }
                     }
-                    localStorage.setItem("users", JSON.stringify(potrebiteli));
+                    localStorage.setItem("users", JSON.stringify(allUsers));
                     $(this).dialog("close");
                 }
             },
@@ -450,8 +476,8 @@ $(document).ready(function () {
     }
 
     function checkLength(o, n, min, max) {
-        if (o.val().length > max || o.val().length < min) {
-            o.addClass("ui-state-error");
+        if (o.length > max || o.length < min) {
+            //o.addClass("ui-state-error");
             updateTips("Length of " + n + " must be between " +
                     min + " and " + max + ".");
             return false;
@@ -462,8 +488,8 @@ $(document).ready(function () {
 
 
     function checkRegexp(o, regexp, n) {
-        if (!(regexp.test(o.val()))) {
-            o.addClass("ui-state-error");
+        if (!(regexp.test(o))) {
+            //o.addClass("ui-state-error");
             updateTips(n);
             return false;
         } else {

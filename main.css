@@ -271,6 +271,7 @@ h1{
 
 
 #textAr{
+    height: 250px;
     font-size: 0.8em;
     overflow: scroll; 
     overflow-x: scroll; 
