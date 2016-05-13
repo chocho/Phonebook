@@ -19,7 +19,6 @@ $(document).ready(function () {
                 .replace(/>/g, '&gt;');
     }
 
-// I needed the opposite function today, so adding here too:
     function htmlUnescape(value) {
         return String(value)
                 .replace(/&quot;/g, '"')
@@ -39,9 +38,41 @@ $(document).ready(function () {
 
     function editEvent() {
         $(".edit").click(function () {
-            //var id = $(this).attr("id");
             var id = $(this).parents("tr").attr("id");
             $("#dialog").dialog("open");
+        $( "#dialog" ).dialog( "option", "title", "Редактирай запис" );
+            
+                $("#dialog").dialog("option", "buttons",
+            [
+                {
+                    text: "Обнови",
+                    icons: {
+                        primary: "ui-icon-heart"
+                    },
+                    click: function () {
+                        var id = localStorage.currentId;
+                        var valid = updateRec(id);
+                        if (valid) {
+                            $(this).dialog("close");
+                        }
+                        location.reload();
+                    }
+                },
+                {
+                    text: "Отмени",
+                    icons: {
+                        primary: "ui-icon-heart"
+                    },
+                    click: function () {
+                        $(this).dialog("close");
+                        location.reload();
+                    }
+                }
+            ]
+            );
+            
+            
+            
             editRec(id);
         });
     }
@@ -54,8 +85,72 @@ $(document).ready(function () {
         });
     }
 
-    function addRecord() {
+    function phoneNameCheck(restoredUsers, assignedUser, id) {
+        var userrr = {};
+        var currentPhone = "";
+        var currentName = "";
+        for (userrr in restoredUsers) {
+            if (id !== undefined) {
+                if (userrr === id) {
+                    continue;
+                }
+            } else {
+                id = 0;
+            }
+            currentPhone = restoredUsers[userrr].phone;
+            currentName = restoredUsers[userrr].name;
+            if (currentPhone === assignedUser.phone) {
+                tips.text("Телефон " + currentPhone + " вече съществува.");
+                return  false;
+            } else if (currentName === assignedUser.name) {
+                tips.text("Името " + currentName + " вече съществува.");
+                return  false;
+            }
 
+        }
+        return true;
+    }
+
+    function inputValidation(phone, name, place, gender, note) {
+        var valid = true;
+        valid = valid && checkLength(phone, "телефон", 5, 12);
+        valid = valid && checkRegexp(phone, /[0+]\d+/, "Телефонът трябва да започва с + или 0, последвани от цифри 0-9");
+        valid = valid && checkLength(name, "името", 1, 30);
+        valid = valid && checkLength(place, "населено място", 0, 30);
+        valid = valid && checkRegexp(gender, /[мж]{1}/, "Моля, изберете пол.");
+        valid = valid && checkLength(note, "населено място", 0, 500);
+        return valid;
+    }
+
+    function appendRecord(rowId, fields, edit) {
+        if (edit !== undefined) {
+            $("tr#" + rowId + "").replaceWith(appending(fields));
+        } else {
+            $("#phoneTable tbody").append(appending(fields));
+        }
+        ;
+        viewEvent();
+        editEvent();
+        trashEvent();
+
+        function appending(fields) {
+            var field = "";
+            var row = "<tr class='row' id='" + rowId + "'>";
+            for (field in fields) {
+                if (field === "note") {
+                    continue;
+                }
+                row += "<td>" + fields[field] + "</td>";
+            }
+            row += "<td><img  class='view' src='images/view.png' width='25' height='25' alt='View icon' title='Виж запис' />" +
+                    "<img  class='edit' src='images/edit.png' width='25' height='25' alt='Edit icon' title='Редактирай запис' />" +
+                    "<img  class='trash' src='images/trash.png' width='25' height='25' alt='Delete icon' title='Изтрий запис' /></td>" +
+                    "</tr>";
+            return row;
+        }
+    }
+
+    function addRecord() {
         var valid = true;
         var thisUser = {};
         thisUser.phone = htmlEscape($("#phone").val());
@@ -70,96 +165,53 @@ $(document).ready(function () {
                 char = "";
             }
         }
-        valid = valid && checkLength(thisUser.phone, "phone number", 5, 12);
-        valid = valid && checkRegexp(thisUser.phone, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
-        valid = valid && checkLength(thisUser.name, "името", 1, 30);
-        valid = valid && checkLength(thisUser.place, "населено място", 0, 30);
-        valid = valid && checkRegexp(thisUser.gender, /[мж]{1}/, "Моля, изберете пол.");
-        valid = valid && checkLength(thisUser.note, "населено място", 0, 500);
-        //valid = valid && checkRegexp(name, /.+/, "Username may consist of a-z, 0-9, underscores, spaces and must begin with a letter.");
-        var userrr = {};
 
-        var potrebiteli = JSON.parse(localStorage.getItem("users"));
-        if (valid && potrebiteli) {
-            for (userrr in potrebiteli) {
-                var currentPhone = potrebiteli[userrr].phone;
-                var currentName = potrebiteli[userrr].name;
-                if (currentPhone === thisUser.phone) {
-                    tips.text("weche go ima телефона");
-                    valid = false;
-                } else if (currentName === thisUser.name) {
-                    tips.text("weche go ima това име");
-                    valid = false;
-                }
-            }
+        valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
+
+        var allUsers = JSON.parse(localStorage.getItem("users"));
+        if (valid && allUsers) {
+            valid = phoneNameCheck(allUsers, thisUser);
         } else {
-            var potrebiteli = {};
+            var allUsers = {};
         }
-        if (valid) {
-            var locid = clickCounter();
-            potrebiteli[localStorage.userId] = thisUser;
-            $("#phoneTable tbody").append("<tr class='row' id='" + localStorage.userId + "'>" +
-                    "<td>" + thisUser.phone + "</td>" +
-                    "<td>" + thisUser.name + "</td>" +
-                    "<td>" + thisUser.place + "</td>" +
-                    "<td>" + thisUser.gender + "</td>" +
-                    "<td>" + thisUser.zodiac + "</td>" +
-                    "<td><img  class='view' src='images/view.png' width='25' height='25' alt='' />" +
-                    "<img  class='edit' src='images/edit.png' width='25' height='25' alt='' />" +
-                    "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
-                    "</tr>");
-            $(this).dialog("close");
-            viewEvent();
-            editEvent();
-            trashEvent();
-            localStorage.setItem("users", JSON.stringify(potrebiteli));
-        }
-        //return valid;
-        //location.reload();
 
+        if (valid) {
+            clickCounter();
+            allUsers[localStorage.userId] = thisUser;
+            appendRecord(localStorage.userId, thisUser);
+            $(this).dialog("close");
+            localStorage.setItem("users", JSON.stringify(allUsers));
+            location.reload();
+        }
     }
     ;
 
     function listRecords() {
-        var restoredUsers = JSON.parse(localStorage.getItem("users"));
-        if (restoredUsers) {
+        var allUsers = JSON.parse(localStorage.getItem("users"));
+        if (allUsers) {
             var userrr = {};
-            for (userrr in restoredUsers) {
-                $("#phoneTable tbody").append("<tr class='row' id='" + userrr + "'>" +
-                        "<td>" + restoredUsers[userrr].phone + "</td>" +
-                        "<td>" + restoredUsers[userrr].name + "</td>" +
-                        "<td>" + restoredUsers[userrr].place + "</td>" +
-                        "<td>" + restoredUsers[userrr].gender + "</td>" +
-                        "<td>" + restoredUsers[userrr].zodiac + "</td>" +
-                        "<td><img class='view' onclick='getElementById(\"demo\").innerHTML=Date()' id='" + userrr + "' src='images/view.png' width='25' height='25' alt='' />" +
-                        "<img class='edit' onclick='getElementById(\"demo\").innerHTML=Date()' id='" + userrr + "' src='images/edit.png' width='25' height='25' alt='' />\n\
-" +
-                        "<img class='trash' onclick='getElementById(\"demo\").innerHTML=Date()' id='" + userrr + "' src='images/trash.png' width='25' height='25' alt='' /></td>" +
-                        "</tr>");
-
-                viewEvent();
-                editEvent();
-                trashEvent();
+            for (userrr in allUsers) {
+                appendRecord(userrr, allUsers[userrr]);
             }
         }
         ;
     }
     ;
     function viewRec(id) {
-        $("#dialog2 p").css("background-color", "#000");
-        var restoredUsers = JSON.parse(localStorage.getItem("users"));
+        //$("#dialog2 p").css("background-color", "#000");
+        var allUsers = JSON.parse(localStorage.getItem("users"));
         localStorage.currentId = id;
-        var phone = restoredUsers[id].phone;
+        var phone = htmlUnescape(allUsers[id].phone);
         $("#dialog2 #phone").text(phone);
-        var name = restoredUsers[id].name;
+        var name = htmlUnescape(allUsers[id].name);
         $("#dialog2 #name").text(name);
-        var place = restoredUsers[id].place;
+        var place = htmlUnescape(allUsers[id].place);
         $("#dialog2 #place").text(place);
-        var gender = restoredUsers[id].gender;
+        var gender = htmlUnescape(allUsers[id].gender);
         $("#dialog2 #gender").text(gender);
-        var zodiac = restoredUsers[id].zodiac;
+        var zodiac = htmlUnescape(allUsers[id].zodiac);
         $("#dialog2 #zodiac").text(zodiac);
-        var note = restoredUsers[id].note;
+        var note = htmlUnescape(allUsers[id].note);
         $("#dialog2 #note").text(note);
     }
 
@@ -189,57 +241,26 @@ $(document).ready(function () {
         thisUser.note = htmlEscape($("#dialog #note").val());
 
         var valid = true;
-        valid = valid && checkLength(thisUser.phone, "phone number", 5, 12);
-        valid = valid && checkRegexp(thisUser.phone, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
-        valid = valid && checkLength(thisUser.name, "името", 1, 30);
-        valid = valid && checkLength(thisUser.place, "населено място", 0, 30);
-        valid = valid && checkRegexp(thisUser.gender, /[мж]{1}/, "Моля, изберете пол.");
-        valid = valid && checkLength(thisUser.note, "населено място", 0, 500);
 
-        var userrr = {};
+        valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
+
         var allUsers = JSON.parse(localStorage.getItem("users"));
         if (valid && allUsers) {
-            for (userrr in allUsers) {
-                if (userrr === id) {
-                    continue;
-                }
-                var currentPhone = allUsers[userrr].phone;
-                var currentName = allUsers[userrr].name;
-                if (currentPhone === thisUser.phone) {
-                    tips.text("Телефонът вече съществува");
-                    valid = false;
-                } else if (currentName === thisUser.name) {
-                    tips.text("Името вече съществува");
-                    valid = false;
-                }
-            }
+            valid = phoneNameCheck(allUsers, thisUser, id);
+
         } else {
             var allUsers = {};
         }
 
         if (valid) {
-            $("tr#" + id + "").replaceWith("<tr class='row' id='" + id + "'>" +
-                    "<td>" + thisUser.phone + "</td>" +
-                    "<td>" + thisUser.name + "</td>" +
-                    "<td>" + thisUser.place + "</td>" +
-                    "<td>" + thisUser.gender + "</td>" +
-                    "<td>" + thisUser.zodiac + "</td>" +
-                    "<td><img  class='view' src='images/view.png' width='25' height='25' alt='' />" +
-                    "<img  class='edit' src='images/edit.png' width='25' height='25' alt='' />" +
-                    "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
-                    "</tr>");
-            viewEvent();
-            editEvent();
-            trashEvent();
-
+            appendRecord(id, thisUser, true);
             allUsers[id] = thisUser;
             localStorage.setItem("users", JSON.stringify(allUsers));
             return true;
-
         } else {
             return false;
         }
-        //location.reload();
+        
     }
 
     function removeRec(id) {
@@ -252,7 +273,29 @@ $(document).ready(function () {
 
     $("#addRec").click(function () {
         $("#dialog").dialog("open");
+        $( "#dialog" ).dialog( "option", "title", "Нов запис" );
+            $("#dialog").dialog("option", "buttons",
+            [
+                {
+                    text: "Добави",
+                    icons: {
+                        primary: "ui-icon-heart"
+                    },
+                    click: addRecord
+                },
+                {
+                    text: "Отмени",
+                    icons: {
+                        primary: "ui-icon-heart"
+                    },
+                    click: function () {
+                        $(this).dialog("close");
+                    }
+                }
+            ]
+            );
     });
+    
     $("#importRec").click(function () {
         $("#importDiv").dialog("open");
     });
@@ -265,48 +308,17 @@ $(document).ready(function () {
         autoOpen: false,
         height: 500,
         width: 400,
-        modal: true,
-        buttons: [
-            {
-                text: "Създай нов",
-                icons: {
-                    primary: "ui-icon-heart"
-                },
-                click: addRecord
-            },
-            {
-                text: "Обнови",
-                icons: {
-                    primary: "ui-icon-heart"
-                },
-                click: function () {
-                    var id = localStorage.currentId;
-                    //$("#phoneTable tr#" + id + "").remove();
-                    var valid = updateRec(id);
-                    if (valid) {
-                        $(this).dialog("close");
-                    }
-                }
-            },
-            {
-                text: "Отмени",
-                icons: {
-                    primary: "ui-icon-heart"
-                },
-                click: function () {
-                    $(this).dialog("close");
-                }
-            }
-        ]
+        modal: true
     });
+
     $("#dialog2").dialog({
         autoOpen: false,
         height: 500,
-        width: 400,
+        width: 420,
         modal: true,
         buttons: [
             {
-                text: "Edit Record",
+                text: "Редактирай",
                 icons: {
                     primary: "ui-icon-heart"
                 },
@@ -318,19 +330,19 @@ $(document).ready(function () {
                 }
             },
             {
-                text: "Delete Record",
+                text: "Изтрий",
                 icons: {
                     primary: "ui-icon-heart"
                 },
                 click: function () {
-                    var id = localStorage.userId;
+                    var id = localStorage.currentId;
                     $(this).dialog("close");
                     $("tr#" + id + "").remove();
                     removeRec(id);
                 }
             },
             {
-                text: "Ok",
+                text: "Отмени",
                 icons: {
                     primary: "ui-icon-heart"
                 },
@@ -403,47 +415,17 @@ $(document).ready(function () {
                             thisUser.note = "";
                         }
 
-                        valid = valid && checkLength(thisUser.phone, "phone number", 5, 12);
-                        valid = valid && checkRegexp(thisUser.phone, /[0+]\d+/, "Phone number may begin with + or 0, followed by 0-9");
-                        valid = valid && checkLength(thisUser.name, "името", 1, 30);
-                        valid = valid && checkLength(thisUser.place, "населено място", 0, 30);
-                        valid = valid && checkRegexp(thisUser.gender, /[мж]{1}/, "Моля, изберете пол.");
-                        valid = valid && checkLength(thisUser.note, "населено място", 0, 500);
+                        valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
 
-                        var userrr = {};
                         if (valid && allUsers) {
-                            for (userrr in allUsers) {
-                                var currentPhone = allUsers[userrr].phone;
-                                var currentName = allUsers[userrr].name;
-                                if (currentPhone === thisUser.phone) {
-                                    tips.text(currentPhone + " вече съществува.");
-                                    valid = false;
-                                } else if (currentName === thisUser.name) {
-                                    tips.text("Вече съществува това име: " + currentName);
-                                    valid = false;
-                                }
-                            }
+                            valid = phoneNameCheck(allUsers, thisUser);
                         } else {
                             var allUsers = {};
                         }
                         if (valid) {
                             clickCounter();
-                            $("#phoneTable tbody").append("<tr class='row' id='" + localStorage.userId + "'>" +
-                                    "<td>" + thisUser.phone + "</td>" +
-                                    "<td>" + thisUser.name + "</td>" +
-                                    "<td>" + thisUser.place + "</td>" +
-                                    "<td>" + thisUser.gender + "</td>" +
-                                    "<td>" + thisUser.zodiac + "</td>" +
-                                    "<td><img  class='view' src='images/view.png' width='25' height='25' alt='' />" +
-                                    "<img  class='edit' src='images/edit.png' width='25' height='25' alt='' />" +
-                                    "<img  class='trash' src='images/trash.png' width='25' height='25' alt='' /></td>" +
-                                    "</tr>");
-
+                            appendRecord(localStorage.userId, thisUser);
                             allUsers[localStorage.userId] = thisUser;
-
-                            viewEvent();
-                            editEvent();
-                            trashEvent();
                             localStorage.setItem("users", JSON.stringify(allUsers));
 
                         } else {
@@ -478,14 +460,13 @@ $(document).ready(function () {
     function checkLength(o, n, min, max) {
         if (o.length > max || o.length < min) {
             //o.addClass("ui-state-error");
-            updateTips("Length of " + n + " must be between " +
-                    min + " and " + max + ".");
+            updateTips("Дължината на полето " + n + " трябва да бъде между " +
+                    min + " и " + max + ".");
             return false;
         } else {
             return true;
         }
     }
-
 
     function checkRegexp(o, regexp, n) {
         if (!(regexp.test(o))) {
@@ -496,14 +477,7 @@ $(document).ready(function () {
             return true;
         }
     }
-    var dialog, form,
-            // From http://www.whatwg.org/specs/web-apps/current-work/multipage/states-of-the-type-attribute.html#e-mail-state-%28type=email%29
-            emailRegex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
-            //name = $("#name"),
-            //email = $("#email"),
-            password = $("#password"),
-            //allFields = $([]).add(name).add(email).add(password),
-            tips = $(".validateTips");
+    var tips = $(".validateTips");
 
     function updateTips(t) {
         tips
