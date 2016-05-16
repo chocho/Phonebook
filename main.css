@@ -1,5 +1,5 @@
 body {
-    font-family: "Verdana";
+    font-family: Verdana, Geneva, sans-serif;
     font-size: 14px;
     line-height: 1.4em
     }
@@ -9,7 +9,14 @@ body {
     background: #f8f8f8
     }
 
-input, textarea {
-    font-family: sans-serif;
-    font-size: 14px
+input, textarea,p {
+    word-wrap: break-word;
+    }
+    
+    #textAr{
+        height: 80%;
+    }
+
+    .buttons{
+        margin-top: 20px;
     }

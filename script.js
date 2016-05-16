@@ -40,39 +40,39 @@ $(document).ready(function () {
         $(".edit").click(function () {
             var id = $(this).parents("tr").attr("id");
             $("#dialog").dialog("open");
-        $( "#dialog" ).dialog( "option", "title", "Редактирай запис" );
-            
-                $("#dialog").dialog("option", "buttons",
-            [
-                {
-                    text: "Обнови",
-                    icons: {
-                        primary: "ui-icon-heart"
-                    },
-                    click: function () {
-                        var id = localStorage.currentId;
-                        var valid = updateRec(id);
-                        if (valid) {
-                            $(this).dialog("close");
+            $("#dialog").dialog("option", "title", "Редактирай запис");
+
+            $("#dialog").dialog("option", "buttons",
+                    [
+                        {
+                            text: "Обнови",
+                            icons: {
+                                primary: "ui-icon-check"
+                            },
+                            click: function () {
+                                var id = localStorage.currentId;
+                                var valid = updateRec(id);
+                                if (valid) {
+                                    $(this).dialog("close");
+                                }
+                                clearData();
+                            }
+                        },
+                        {
+                            text: "Отмени",
+                            icons: {
+                                primary: "ui-icon-cancel"
+                            },
+                            click: function () {
+                                $(this).dialog("close");
+                                clearData();
+                            }
                         }
-                        location.reload();
-                    }
-                },
-                {
-                    text: "Отмени",
-                    icons: {
-                        primary: "ui-icon-heart"
-                    },
-                    click: function () {
-                        $(this).dialog("close");
-                        location.reload();
-                    }
-                }
-            ]
-            );
-            
-            
-            
+                    ]
+                    );
+
+
+
             editRec(id);
         });
     }
@@ -100,10 +100,10 @@ $(document).ready(function () {
             currentPhone = restoredUsers[userrr].phone;
             currentName = restoredUsers[userrr].name;
             if (currentPhone === assignedUser.phone) {
-                tips.text("Телефон " + currentPhone + " вече съществува.");
+                updateTips("Телефон " + currentPhone + " вече съществува.");
                 return  false;
             } else if (currentName === assignedUser.name) {
-                tips.text("Името " + currentName + " вече съществува.");
+                updateTips("Името " + currentName + " вече съществува.");
                 return  false;
             }
 
@@ -113,12 +113,12 @@ $(document).ready(function () {
 
     function inputValidation(phone, name, place, gender, note) {
         var valid = true;
-        valid = valid && checkLength(phone, "телефон", 5, 12);
+        valid = valid && checkLength(phone, "Телефон", 5, 12);
         valid = valid && checkRegexp(phone, /[0+]\d+/, "Телефонът трябва да започва с + или 0, последвани от цифри 0-9");
-        valid = valid && checkLength(name, "името", 1, 30);
-        valid = valid && checkLength(place, "населено място", 0, 30);
+        valid = valid && checkLength(name, "Име", 1, 30);
+        valid = valid && checkLength(place, "Населено място", 0, 30);
         valid = valid && checkRegexp(gender, /[мж]{1}/, "Моля, изберете пол.");
-        valid = valid && checkLength(note, "населено място", 0, 500);
+        valid = valid && checkLength(note, "Бележки", 0, 500);
         return valid;
     }
 
@@ -181,7 +181,8 @@ $(document).ready(function () {
             appendRecord(localStorage.userId, thisUser);
             $(this).dialog("close");
             localStorage.setItem("users", JSON.stringify(allUsers));
-            location.reload();
+            //location.reload();
+            clearData();
         }
     }
     ;
@@ -198,7 +199,6 @@ $(document).ready(function () {
     }
     ;
     function viewRec(id) {
-        //$("#dialog2 p").css("background-color", "#000");
         var allUsers = JSON.parse(localStorage.getItem("users"));
         localStorage.currentId = id;
         var phone = htmlUnescape(allUsers[id].phone);
@@ -260,7 +260,7 @@ $(document).ready(function () {
         } else {
             return false;
         }
-        
+
     }
 
     function removeRec(id) {
@@ -273,29 +273,32 @@ $(document).ready(function () {
 
     $("#addRec").click(function () {
         $("#dialog").dialog("open");
-        $( "#dialog" ).dialog( "option", "title", "Нов запис" );
-            $("#dialog").dialog("option", "buttons",
-            [
-                {
-                    text: "Добави",
-                    icons: {
-                        primary: "ui-icon-heart"
+        $("#dialog").dialog("option", "title", "Нов запис");
+        $("#dialog").dialog("option", "buttons",
+                [
+                    {
+                        text: "Добави",
+                        icons: {
+                            primary: "ui-icon-check"
+                        },
+                        click: addRecord
                     },
-                    click: addRecord
-                },
-                {
-                    text: "Отмени",
-                    icons: {
-                        primary: "ui-icon-heart"
-                    },
-                    click: function () {
-                        $(this).dialog("close");
+                    {
+                        text: "Отмени",
+                        icons: {
+                            primary: "ui-icon-cancel"
+                        },
+                        click: function () {
+                            if (tips.text !== "") {
+                                tips.text("");
+                            }
+                            $(this).dialog("close");
+                        }
                     }
-                }
-            ]
-            );
+                ]
+                );
     });
-    
+
     $("#importRec").click(function () {
         $("#importDiv").dialog("open");
     });
@@ -306,33 +309,66 @@ $(document).ready(function () {
 
     $("#dialog").dialog({
         autoOpen: false,
-        height: 500,
-        width: 400,
+        height: 700,
+        width: 420,
         modal: true
     });
 
     $("#dialog2").dialog({
         autoOpen: false,
-        height: 500,
+        height: 700,
         width: 420,
         modal: true,
         buttons: [
             {
                 text: "Редактирай",
                 icons: {
-                    primary: "ui-icon-heart"
+                    primary: "ui-icon-pencil"
                 },
                 click: function () {
                     var id = localStorage.currentId;
                     $(this).dialog("close");
                     $("#dialog").dialog("open");
+                    $("#dialog").dialog("option", "title", "Редактирай запис");
+
+                    $("#dialog").dialog("option", "buttons",
+                            [
+                                {
+                                    text: "Обнови",
+                                    icons: {
+                                        primary: "ui-icon-check"
+                                    },
+                                    click: function () {
+                                        var id = localStorage.currentId;
+                                        var valid = updateRec(id);
+                                        if (valid) {
+                                            $(this).dialog("close");
+                                        }
+                                        clearData();
+                                    }
+                                },
+                                {
+                                    text: "Отмени",
+                                    icons: {
+                                        primary: "ui-icon-cancel"
+                                    },
+                                    click: function () {
+                                        if (tips.text !== "") {
+                                            tips.text("");
+                                        }
+                                        $(this).dialog("close");
+                                        clearData();
+                                    }
+                                }
+                            ]
+                            );
                     editRec(id);
                 }
             },
             {
                 text: "Изтрий",
                 icons: {
-                    primary: "ui-icon-heart"
+                    primary: "ui-icon-trash"
                 },
                 click: function () {
                     var id = localStorage.currentId;
@@ -344,9 +380,12 @@ $(document).ready(function () {
             {
                 text: "Отмени",
                 icons: {
-                    primary: "ui-icon-heart"
+                    primary: "ui-icon-cancel"
                 },
                 click: function () {
+                    if (tips.text !== "") {
+                        tips.text("");
+                    }
                     $(this).dialog("close");
                 }
             }
@@ -355,20 +394,20 @@ $(document).ready(function () {
 
     $("#importDiv").dialog({
         autoOpen: false,
-        height: 400,
+        height: 700,
         width: 800,
         modal: true,
         buttons: [
             {
                 text: "Запиши",
                 icons: {
-                    primary: "ui-icon-heart"
+                    primary: "ui-icon-check"
                 },
                 click: function () {
                     var valid = true;
                     var entered = $("#textAr").val();
                     if (!entered) {
-                        tips.text("Моля, въведете данни.");
+                        updateTips("Моля, въведете данни.");
 
                         return valid = false;
                     }
@@ -439,29 +478,44 @@ $(document).ready(function () {
             {
                 text: "Отмени",
                 icons: {
-                    primary: "ui-icon-heart"
+                    primary: "ui-icon-cancel"
                 },
                 click: function () {
+                    if (tips.text !== "") {
+                        tips.text("");
+                    }
                     $(this).dialog("close");
                 }
             }
         ]
     });
+    $("#importDiv").dialog("option", "title", "Импортирай  записи");
 
-    function updateTips(t) {
-        tips
-                .text(t)
-                .addClass("ui-state-highlight");
-        setTimeout(function () {
-            tips.removeClass("ui-state-highlight", 1500);
-        }, 500);
-    }
+    $(function () {
+        var availableTags = [
+            "Овен",
+            "Телец",
+            "Близнаци",
+            "Рак",
+            "Лъв",
+            "Дева",
+            "Везни",
+            "Скорпион",
+            "Стрелец",
+            "Козирог",
+            "Водолей",
+            "Риби"
+        ];
+        $("#zodiac").autocomplete({
+            source: availableTags
+        });
+    });
 
     function checkLength(o, n, min, max) {
         if (o.length > max || o.length < min) {
             //o.addClass("ui-state-error");
-            updateTips("Дължината на полето " + n + " трябва да бъде между " +
-                    min + " и " + max + ".");
+            updateTips("Дължината на полето '" + n + "' трябва да бъде между " +
+                    min + " и " + max + " .");
             return false;
         } else {
             return true;
@@ -482,10 +536,19 @@ $(document).ready(function () {
     function updateTips(t) {
         tips
                 .text(t)
-                .addClass("ui-state-highlight");
+                //.addClass("ui-state-highlight");
+                .addClass("bg-danger");
         setTimeout(function () {
-            tips.removeClass("ui-state-highlight", 1500);
+            tips.removeClass("bg-danger", 1500);
         }, 500);
     }
+    function clearData() {
+
+
+        $(':input', 'form').val('').removeAttr('checked').removeAttr('selected');
+    }
+    ;
+
+
     listRecords();
 });

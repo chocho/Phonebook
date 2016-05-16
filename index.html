@@ -1,128 +1,122 @@
 <!DOCTYPE html>
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="icon" href="data:;base64,iVBORw0KGgo="> 
-    <title>Телефонен указател</title>
-    <meta name="description" content="All sites">
-    <meta name="viewport" content="width=device-width">  
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+        <title>Телефонен указател</title>
+        <meta name="description" content="All sites">
+        <meta name="viewport" content="width=device-width">
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
-    <link rel="stylesheet" href="main.css">
-    <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-    <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-    <script src="script.js"></script>
+        <link rel="stylesheet" href="main.css">
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+        <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+        <script src="script.js"></script>
 
-</head>
-<body>
-    <div class="container-fluid">   
-        
-            <h1 class="text-center">Телефонен указател</h1>
-            
-             <div class="text-center">   <button type="button" class="btn btn-primary" id="addRec">Добави запис</button>
-                <button type="button" class="btn btn-primary" id="importRec">Импортирай записи</button>
-                <button type="button" class="btn btn-danger" id="clearLS">Изтрий всичко</button>
-             </div>
-            <br />
-        
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div  class="col-md-8"><h2>Телефонен указател</h2></div>
 
-        <div class="table-responsive"> 
-            <table id="phoneTable" class="table">
+                <div class="col-md-4 buttons">   <button type="button" class="btn btn-primary" id="addRec">Добави запис</button>
+                    <button type="button" class="btn btn-primary" id="importRec">Импортирай записи</button>
+                    <!--            <button type="button" class="btn btn-danger" id="clearLS">Изтрий всичко</button>
+                    -->       
+                </div>
+            </div>
+
+            <br /> 
+            <div class='clear'></div>
+            <table id="phoneTable" class="table table-striped">
                 <tbody>
                     <tr class="row">
-                        <th class="col-md-1">Телефон</th>
-                        <th class="col-md-1">Име</th>
-                        <th class="col-md-1">Населено място</th>
+                        <th class="col-md-2">Телефон</th>
+                        <th class="col-md-3">Име</th>
+                        <th class="col-md-3">Населено място</th>
                         <th class="col-md-1">Пол</th>
-                        <th class="col-md-1">Зодия</th>
-                        <th class="col-md-1"></th>       
+                        <th class="col-md-2">Зодия</th>
+                        <th class="col-md-1"></th>
                     </tr>
                 </tbody>
             </table>
-        </div>  
-        <div class="text-center">
-            &copy; 2016 Chocho
+
+            <div class="text-center">
+                &copy2016
+            </div>
         </div>
-    </div>
 
+        <div id="dialog">
+            <p class=""><i>Полетата със звезда са задължителни.</i></p>
+            <p class="validateTips"></p>
 
+            <form>
+                <fieldset>
+                    <div class="form-group">
+                        <label for="phone">Телефон (5-12)*</label>
+                        <input type="text" class="form-control" id="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="name">Име (1-30) *</label>
+                        <input type="text" class="form-control" id="name">
+                    </div>
+                    <div class="form-group">
+                        <label for="place">Населено място (0-30)</label>
+                        <input type="text" class="form-control" id="place">
+                    </div>
+                    <div class="form-group">
+                        <label for="gender">Пол *</label><br />
+                        <select class="" id="gender">
+                            <option></option>
+                            <option>м</option>
+                            <option>ж</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="zodiac">Зодия</label><br />
+                        <input id="zodiac">
+                    </div>
 
+                    <div class="form-group">
+                        <label for="note">Бележки (0-500)</label>
+                        <textarea class="form-control" id="note"></textarea>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
 
+        <div id="dialog2" title="Потребител">
+            <h4>Телефон</h4>
+            <p  id="phone"  class=""></p>
+            <h4>Име</h4>
+            <p  id="name"  class=""></p>
+            <h4>Населено място</h4>
+            <p id="place"  class=""></p>
+            <h4>Пол</h4>
+            <p id="gender"  class=""></p>
+            <h4>Зодия</h4>
+            <p id="zodiac"  class=""></p>
+            <h4>Бележки</h4>
+            <p  id="note"  class=""> </p>
+        </div>
 
+        <div id="importDiv" class="form-group">
+            <p class=""><i>Поставете (paste) <b>предварително подготвени</b> записи, които да бъдат импортирани наведнъж. Всеки запис е на отделен ред.
+                    Полетата в рамките на даден запис са разделени с TAB, като те се очаква да бъдат в следната последователност:
+                    1*)	телефонен номер,
+                    2*)	име на контакт,
+                    3)	населено място,
+                    4*)	пол („м“ или „ж“),
+                    5)	зодия,
+                    6)	бележки. Полетата, отбелязани със звезда, са задължителни.</i>
+            </p>
+            <p class="validateTips"></p>
+            <textarea class="form-control" id = "textAr" rows="30" cols="100" autofocus></textarea>
+        </div>
 
-    <div id="dialog">
-        <p class="validateTips">Полетата със звезда са задължителни.</p>
-
-        <form>
-            <fieldset>
-                <div class="form-group">
-                    <label for="name">Телефон *</label>
-                    <input type="text" class="form-control" id="phone">
-                </div>
-                <div class="form-group">
-                    <label for="name">Име *</label>
-                    <input type="text" class="form-control" id="name">
-                </div>   
-                <div class="form-group">
-                    <label for="name">Населено място</label>
-                    <input type="text" class="form-control" id="place">
-                </div>  
-                <div class="form-group">
-                    <label for="name">Пол *</label>
-                    <select id="gender">
-                        <option value=""></option>
-                        <option value="м">м</option>
-                        <option value="ж">ж</option>
-                    </select>
-                </div>  
-                <div class="form-group">
-                    <label for="zodiac">Зодия</label>
-                    <select id="zodiac">
-                        <option value=""></option>
-                        <option value="Овен">Овен</option>
-                        <option value="Телец">Телец</option>
-                        <option value="Близнаци">Близнаци</option>
-                        <option value="Рак">Рак</option>
-                        <option value="Лъв">Лъв</option>
-                        <option value="Дева">Дева</option>
-                        <option value="Везни">Везни</option>
-                        <option value="Скорпион">Скорпион</option>
-                        <option value="Стрелец">Стрелец</option>
-                        <option value="Козирог">Козирог</option>
-                        <option value="Водолей">Водолей</option>
-                        <option value="Риби">Риби</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="name">Бележки</label>
-                    <input type="text" class="form-control" id="note">
-                </div>
-            </fieldset>
-        </form>
-    </div>
-
-    <div id="dialog2" title="Потребител">
-        <h4>Телефон</h4>
-        <p  id="phone"  class=""></p>
-        <h4>Име</h4>
-        <p  id="name"  class=""></p>
-        <h4>Населено място</h4>
-        <p id="place"  class=""></p>
-        <h4>Пол</h4>
-        <p id="gender"  class=""></p>
-        <h4>Зодия</h4>
-        <p id="zodiac"  class=""></p>
-        <h4>Бележки</h4>
-        <p  id="note"  class=""> </p>
-    </div>
-
-    <div id="importDiv" >
-        <p class="validateTips">Полетата със звезда са задължителни</p>
-        <textarea id = "textAr" rows="54" cols="100" autofocus></textarea>
-    </div>
-
-</body>
+    </body>
 </html>
