@@ -31,7 +31,7 @@ $(document).ready(function () {
     function viewEvent() {
         $(".view").click(function () {
             var id = $(this).parents("tr").attr("id");
-            $("#dialog2").dialog("open");
+            $("#viewDiv").dialog("open");
             viewRec(id);
         });
     }
@@ -39,10 +39,9 @@ $(document).ready(function () {
     function editEvent() {
         $(".edit").click(function () {
             var id = $(this).parents("tr").attr("id");
-            $("#dialog").dialog("open");
-            $("#dialog").dialog("option", "title", "Редактирай запис");
-
-            $("#dialog").dialog("option", "buttons",
+            $("#addEditDiv").dialog("open");
+            $("#addEditDiv").dialog("option", "title", "Редактирай запис");
+            $("#addEditDiv").dialog("option", "buttons",
                     [
                         {
                             text: "Обнови",
@@ -70,9 +69,6 @@ $(document).ready(function () {
                         }
                     ]
                     );
-
-
-
             editRec(id);
         });
     }
@@ -106,7 +102,6 @@ $(document).ready(function () {
                 updateTips("Името " + currentName + " вече съществува.");
                 return  false;
             }
-
         }
         return true;
     }
@@ -122,18 +117,79 @@ $(document).ready(function () {
         return valid;
     }
 
-    function appendRecord(rowId, fields, edit) {
-        if (edit !== undefined) {
-            $("tr#" + rowId + "").replaceWith(appending(fields));
-        } else {
-            $("#phoneTable tbody").append(appending(fields));
-        }
-        ;
-        viewEvent();
-        editEvent();
-        trashEvent();
+    /*function addRecord() {
+     var valid = true;
+     var thisUser = {};
+     thisUser.phone = htmlEscape($("#phone").val());
+     thisUser.name = htmlEscape($("#name").val());
+     thisUser.place = htmlEscape($("#place").val());
+     thisUser.gender = htmlEscape($("#gender").val());
+     thisUser.zodiac = htmlEscape($("#zodiac").val());
+     thisUser.note = htmlEscape($("#note").val());
+     var char = "";
+     for (char in thisUser) {
+     if (char === undefined) {
+     char = "";
+     }
+     }
+     
+     valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
+     
+     var allUsers = JSON.parse(localStorage.getItem("users"));
+     if (valid && allUsers) {
+     valid = phoneNameCheck(allUsers, thisUser);
+     } else {
+     var allUsers = {};
+     }
+     
+     if (valid) {
+     clickCounter();
+     allUsers[localStorage.userId] = thisUser;
+     appendRecord(localStorage.userId, thisUser);
+     $(this).dialog("close");
+     localStorage.setItem("users", JSON.stringify(allUsers));
+     clearData();
+     }
+     }
+     ;*/
 
-        function appending(fields) {
+    /** function listRecords() {
+     var allUsers = JSON.parse(localStorage.getItem("users"));
+     if (allUsers) {
+     var userrr = {};
+     for (userrr in allUsers) {
+     appendRecord(userrr, allUsers[userrr]);
+     }
+     }
+     ;
+     }
+     ;*/
+
+    var list = function () {
+        var allUsers = JSON.parse(localStorage.getItem("users"));
+        var userrr = {};
+        function allUs() {
+            for (userrr in allUsers) {
+                appendRecord(userrr, allUsers[userrr]);
+                //testing();
+            }
+        }
+        function testing() {
+            alert(543543);
+        }
+        function appendRecord(rowId, fields, edit) {
+            if (edit !== undefined) {
+                $("tr#" + rowId + "").replaceWith(appending(fields));
+            } else {
+                $("#phoneTable tbody").append(appending(fields, rowId));
+            }
+            ;
+            viewEvent();
+            editEvent();
+            trashEvent();
+        }
+
+        function appending(fields, rowId) {
             var field = "";
             var row = "<tr class='row' id='" + rowId + "'>";
             for (field in fields) {
@@ -148,106 +204,130 @@ $(document).ready(function () {
                     "</tr>";
             return row;
         }
-    }
+        ;
 
-    function addRecord() {
-        var valid = true;
-        var thisUser = {};
-        thisUser.phone = htmlEscape($("#phone").val());
-        thisUser.name = htmlEscape($("#name").val());
-        thisUser.place = htmlEscape($("#place").val());
-        thisUser.gender = htmlEscape($("#gender").val());
-        thisUser.zodiac = htmlEscape($("#zodiac").val());
-        thisUser.note = htmlEscape($("#note").val());
-        var char = "";
-        for (char in thisUser) {
-            if (char === undefined) {
-                char = "";
+        function addRecord() {
+            var valid = true;
+            var thisUser = {};
+            thisUser.phone = htmlEscape($("#phone").val());
+            thisUser.name = htmlEscape($("#name").val());
+            thisUser.place = htmlEscape($("#place").val());
+            thisUser.gender = htmlEscape($("#gender").val());
+            thisUser.zodiac = htmlEscape($("#zodiac").val());
+            thisUser.note = htmlEscape($("#note").val());
+            var char = "";
+            for (char in thisUser) {
+                if (char === undefined) {
+                    char = "";
+                }
             }
-        }
 
-        valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
+            valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
 
-        var allUsers = JSON.parse(localStorage.getItem("users"));
-        if (valid && allUsers) {
-            valid = phoneNameCheck(allUsers, thisUser);
-        } else {
-            var allUsers = {};
-        }
+            var allUsers = JSON.parse(localStorage.getItem("users"));
+            if (valid && allUsers) {
+                valid = phoneNameCheck(allUsers, thisUser);
+            } else {
+                var allUsers = {};
+            }
 
-        if (valid) {
-            clickCounter();
-            allUsers[localStorage.userId] = thisUser;
-            appendRecord(localStorage.userId, thisUser);
-            $(this).dialog("close");
-            localStorage.setItem("users", JSON.stringify(allUsers));
-            //location.reload();
-            clearData();
-        }
-    }
-    ;
-
-    function listRecords() {
-        var allUsers = JSON.parse(localStorage.getItem("users"));
-        if (allUsers) {
-            var userrr = {};
-            for (userrr in allUsers) {
-                appendRecord(userrr, allUsers[userrr]);
+            if (valid) {
+                clickCounter();
+                allUsers[localStorage.userId] = thisUser;
+                appendRecord(localStorage.userId, thisUser);
+                $(this).dialog("close");
+                localStorage.setItem("users", JSON.stringify(allUsers));
+                clearData();
             }
         }
         ;
-    }
-    ;
+
+        return {
+            listing: function () {
+                allUs();
+            },
+            adpending: function () {
+
+            }
+        };
+    };
+
+    /*function appendRecord(rowId, fields, edit) {
+     if (edit !== undefined) {
+     $("tr#" + rowId + "").replaceWith(appending(fields));
+     } else {
+     $("#phoneTable tbody").append(appending(fields));
+     }
+     ;
+     viewEvent();
+     editEvent();
+     trashEvent();
+     
+     function appending(fields) {
+     var field = "";
+     var row = "<tr class='row' id='" + rowId + "'>";
+     for (field in fields) {
+     if (field === "note") {
+     continue;
+     }
+     row += "<td>" + fields[field] + "</td>";
+     }
+     row += "<td><img  class='view' src='images/view.png' width='25' height='25' alt='View icon' title='Виж запис' />" +
+     "<img  class='edit' src='images/edit.png' width='25' height='25' alt='Edit icon' title='Редактирай запис' />" +
+     "<img  class='trash' src='images/trash.png' width='25' height='25' alt='Delete icon' title='Изтрий запис' /></td>" +
+     "</tr>";
+     return row;
+     }
+     }*/
+
     function viewRec(id) {
         var allUsers = JSON.parse(localStorage.getItem("users"));
         localStorage.currentId = id;
         var phone = htmlUnescape(allUsers[id].phone);
-        $("#dialog2 #phone").text(phone);
+        $("#viewDiv #phone").text(phone);
         var name = htmlUnescape(allUsers[id].name);
-        $("#dialog2 #name").text(name);
+        $("#viewDiv #name").text(name);
         var place = htmlUnescape(allUsers[id].place);
-        $("#dialog2 #place").text(place);
+        $("#viewDiv #place").text(place);
         var gender = htmlUnescape(allUsers[id].gender);
-        $("#dialog2 #gender").text(gender);
+        $("#viewDiv #gender").text(gender);
         var zodiac = htmlUnescape(allUsers[id].zodiac);
-        $("#dialog2 #zodiac").text(zodiac);
+        $("#viewDiv #zodiac").text(zodiac);
         var note = htmlUnescape(allUsers[id].note);
-        $("#dialog2 #note").text(note);
+        $("#viewDiv #note").text(note);
     }
 
     function editRec(id) {
         var allUsers = JSON.parse(localStorage.getItem("users"));
         localStorage.currentId = id;
         var phone = allUsers[id].phone;
-        $("#dialog #phone").val(phone);
+        $("#addEditDiv #phone").val(phone);
         var name = htmlUnescape(allUsers[id].name);
-        $("#dialog #name").val(name);
+        $("#addEditDiv #name").val(name);
         var place = allUsers[id].place;
-        $("#dialog #place").val(place);
+        $("#addEditDiv #place").val(place);
         var gender = allUsers[id].gender;
-        $("#dialog #gender").val(gender);
+        $("#addEditDiv #gender").val(gender);
         var zodiac = allUsers[id].zodiac;
-        $("#dialog #zodiac").val(zodiac);
+        $("#addEditDiv #zodiac").val(zodiac);
         var note = allUsers[id].note;
-        $("#dialog #note").val(note);
+        $("#addEditDiv #note").val(note);
     }
+
     function updateRec(id) {
         var thisUser = {};
-        thisUser.phone = htmlEscape($("#dialog #phone").val());
-        thisUser.name = htmlEscape($("#dialog #name").val());
-        thisUser.place = htmlEscape($("#dialog #place").val());
-        thisUser.gender = htmlEscape($("#dialog #gender").val());
-        thisUser.zodiac = htmlEscape($("#dialog #zodiac").val());
-        thisUser.note = htmlEscape($("#dialog #note").val());
+        thisUser.phone = htmlEscape($("#addEditDiv #phone").val());
+        thisUser.name = htmlEscape($("#addEditDiv #name").val());
+        thisUser.place = htmlEscape($("#addEditDiv #place").val());
+        thisUser.gender = htmlEscape($("#addEditDiv #gender").val());
+        thisUser.zodiac = htmlEscape($("#addEditDiv #zodiac").val());
+        thisUser.note = htmlEscape($("#addEditDiv #note").val());
 
         var valid = true;
-
         valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
-
         var allUsers = JSON.parse(localStorage.getItem("users"));
         if (valid && allUsers) {
             valid = phoneNameCheck(allUsers, thisUser, id);
-
         } else {
             var allUsers = {};
         }
@@ -260,7 +340,6 @@ $(document).ready(function () {
         } else {
             return false;
         }
-
     }
 
     function removeRec(id) {
@@ -269,12 +348,11 @@ $(document).ready(function () {
         localStorage.setItem("users", JSON.stringify(allUsers));
     }
 
-    $("#dialog").dialog({autoOpen: false});
-
+    $("#addEditDiv").dialog({autoOpen: false});
     $("#addRec").click(function () {
-        $("#dialog").dialog("open");
-        $("#dialog").dialog("option", "title", "Нов запис");
-        $("#dialog").dialog("option", "buttons",
+        $("#addEditDiv").dialog("open");
+        $("#addEditDiv").dialog("option", "title", "Нов запис");
+        $("#addEditDiv").dialog("option", "buttons",
                 [
                     {
                         text: "Добави",
@@ -307,16 +385,14 @@ $(document).ready(function () {
         localStorage.clear();
     });
 
-    $("#dialog").dialog({
+    $("#addEditDiv").dialog({
         autoOpen: false,
-        height: 700,
         width: 420,
         modal: true
     });
 
-    $("#dialog2").dialog({
+    $("#viewDiv").dialog({
         autoOpen: false,
-        height: 700,
         width: 420,
         modal: true,
         buttons: [
@@ -328,10 +404,9 @@ $(document).ready(function () {
                 click: function () {
                     var id = localStorage.currentId;
                     $(this).dialog("close");
-                    $("#dialog").dialog("open");
-                    $("#dialog").dialog("option", "title", "Редактирай запис");
-
-                    $("#dialog").dialog("option", "buttons",
+                    $("#addEditDiv").dialog("open");
+                    $("#addEditDiv").dialog("option", "title", "Редактирай запис");
+                    $("#addEditDiv").dialog("option", "buttons",
                             [
                                 {
                                     text: "Обнови",
@@ -394,7 +469,7 @@ $(document).ready(function () {
 
     $("#importDiv").dialog({
         autoOpen: false,
-        height: 700,
+        height: 600,
         width: 800,
         modal: true,
         buttons: [
@@ -407,12 +482,11 @@ $(document).ready(function () {
                     var valid = true;
                     var entered = $("#textAr").val();
                     if (!entered) {
-                        updateTips("Моля, въведете данни.");
 
+                        updateTips("Моля, въведете данни.");
                         return valid = false;
                     }
                     var res = entered.match(/.+$/gm);
-
                     var allUsers = JSON.parse(localStorage.getItem("users"));
                     if (!allUsers) {
                         var allUsers = {};
@@ -455,7 +529,6 @@ $(document).ready(function () {
                         }
 
                         valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
-
                         if (valid && allUsers) {
                             valid = phoneNameCheck(allUsers, thisUser);
                         } else {
@@ -513,7 +586,6 @@ $(document).ready(function () {
 
     function checkLength(o, n, min, max) {
         if (o.length > max || o.length < min) {
-            //o.addClass("ui-state-error");
             updateTips("Дължината на полето '" + n + "' трябва да бъде между " +
                     min + " и " + max + " .");
             return false;
@@ -524,7 +596,6 @@ $(document).ready(function () {
 
     function checkRegexp(o, regexp, n) {
         if (!(regexp.test(o))) {
-            //o.addClass("ui-state-error");
             updateTips(n);
             return false;
         } else {
@@ -536,19 +607,17 @@ $(document).ready(function () {
     function updateTips(t) {
         tips
                 .text(t)
-                //.addClass("ui-state-highlight");
                 .addClass("bg-danger");
         setTimeout(function () {
             tips.removeClass("bg-danger", 1500);
         }, 500);
     }
     function clearData() {
-
-
         $(':input', 'form').val('').removeAttr('checked').removeAttr('selected');
     }
     ;
+    //listRecords();
 
-
-    listRecords();
+    var listed = list();
+    listed.listing();
 });

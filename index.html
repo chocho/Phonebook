@@ -6,32 +6,25 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="icon" href="data:;base64,iVBORw0KGgo=">
         <title>Телефонен указател</title>
-        <meta name="description" content="All sites">
         <meta name="viewport" content="width=device-width">
-
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-
         <link rel="stylesheet" href="main.css">
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
         <script src="//code.jquery.com/jquery-1.10.2.js"></script>
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         <script src="script.js"></script>
-
     </head>
     <body>
         <div class="container">
             <div class="row">
                 <div  class="col-md-8"><h2>Телефонен указател</h2></div>
-
                 <div class="col-md-4 buttons">   <button type="button" class="btn btn-primary" id="addRec">Добави запис</button>
                     <button type="button" class="btn btn-primary" id="importRec">Импортирай записи</button>
-                    <!--            <button type="button" class="btn btn-danger" id="clearLS">Изтрий всичко</button>
-                    -->       
+                    <button type="button" class="btn btn-danger" id="clearLS">Изтрий всичко</button>     
                 </div>
             </div>
-
-            <br /> 
-            <div class='clear'></div>
+            <br />
+            <div>
             <table id="phoneTable" class="table table-striped">
                 <tbody>
                     <tr class="row">
@@ -44,16 +37,14 @@
                     </tr>
                 </tbody>
             </table>
-
+            </div>
             <div class="text-center">
                 &copy2016
             </div>
         </div>
-
-        <div id="dialog">
-            <p class=""><i>Полетата със звезда са задължителни.</i></p>
+        <div id="addEditDiv">
+            <p><i>Полетата със звезда са задължителни.</i></p>
             <p class="validateTips"></p>
-
             <form>
                 <fieldset>
                     <div class="form-group">
@@ -80,7 +71,6 @@
                         <label for="zodiac">Зодия</label><br />
                         <input id="zodiac">
                     </div>
-
                     <div class="form-group">
                         <label for="note">Бележки (0-500)</label>
                         <textarea class="form-control" id="note"></textarea>
@@ -89,23 +79,23 @@
             </form>
         </div>
 
-        <div id="dialog2" title="Потребител">
+        <div id="viewDiv" title="Потребител">
             <h4>Телефон</h4>
-            <p  id="phone"  class=""></p>
+            <p  id="phone"></p>
             <h4>Име</h4>
-            <p  id="name"  class=""></p>
+            <p  id="name"></p>
             <h4>Населено място</h4>
-            <p id="place"  class=""></p>
+            <p id="place"></p>
             <h4>Пол</h4>
-            <p id="gender"  class=""></p>
+            <p id="gender"></p>
             <h4>Зодия</h4>
-            <p id="zodiac"  class=""></p>
+            <p id="zodiac"></p>
             <h4>Бележки</h4>
-            <p  id="note"  class=""> </p>
+            <p  id="note"> </p>
         </div>
 
         <div id="importDiv" class="form-group">
-            <p class=""><i>Поставете (paste) <b>предварително подготвени</b> записи, които да бъдат импортирани наведнъж. Всеки запис е на отделен ред.
+            <p><i>Поставете (paste) <b>предварително подготвени</b> записи, които да бъдат импортирани наведнъж. Всеки запис е на отделен ред.
                     Полетата в рамките на даден запис са разделени с TAB, като те се очаква да бъдат в следната последователност:
                     1*)	телефонен номер,
                     2*)	име на контакт,
@@ -115,8 +105,7 @@
                     6)	бележки. Полетата, отбелязани със звезда, са задължителни.</i>
             </p>
             <p class="validateTips"></p>
-            <textarea class="form-control" id = "textAr" rows="30" cols="100" autofocus></textarea>
+            <textarea class="form-control" id = "textAr"  autofocus></textarea>
         </div>
-
     </body>
 </html>

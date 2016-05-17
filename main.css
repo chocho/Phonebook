@@ -5,7 +5,6 @@ body {
     }
 
 body {
-    margin-top: 20px;
     background: #f8f8f8
     }
 
@@ -14,7 +13,7 @@ input, textarea,p {
     }
     
     #textAr{
-        height: 80%;
+        height: 75%;
     }
 
     .buttons{
