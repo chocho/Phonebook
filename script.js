@@ -3,14 +3,12 @@ $(document).ready(function () {
         var tips = $(".validateTips");
         var allUsers = JSON.parse(localStorage.getItem("users"));
         var userrr = {};
-
         function listAllUsers() {
             for (userrr in allUsers) {
                 tableRecordAppend(userrr, allUsers[userrr]);
             }
         }
         ;
-
         function clickCounter() {
             if (typeof (Storage) !== "undefined") {
                 if (localStorage.userId) {
@@ -71,22 +69,11 @@ $(document).ready(function () {
                 $("#addEditDiv").dialog("option", "title", "Редактирай запис");
                 $("#addEditDiv").dialog("option", "buttons",
                         [
-                            {
-                                text: "Обнови",
-                                icons: {
-                                    primary: "ui-icon-check"
-                                },
-                                click: eventUpdateButton
-                            },
-                            {
-                                text: "Отмени",
-                                icons: {
-                                    primary: "ui-icon-cancel"
-                                },
-                                click: closeClear
-                            }
+                            buttons("Обнови", "ui-icon-check", eventUpdateButton),
+                            buttons("Отмени", "ui-icon-cancel", closeClear)
                         ]
                         );
+
                 recordEdit(id);
             });
         }
@@ -163,7 +150,6 @@ $(document).ready(function () {
             return row;
         }
         ;
-
         function recordAdd() {
             var valid = true;
             var thisUser = {};
@@ -181,7 +167,6 @@ $(document).ready(function () {
             }
 
             valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
-
             var allUsers = JSON.parse(localStorage.getItem("users"));
             if (valid && allUsers) {
                 valid = phoneNameCheck(allUsers, thisUser);
@@ -241,7 +226,6 @@ $(document).ready(function () {
             thisUser.gender = htmlEscape($("#addEditDiv #gender").val());
             thisUser.zodiac = htmlEscape($("#addEditDiv #zodiac").val());
             thisUser.note = htmlEscape($("#addEditDiv #note").val());
-
             var valid = true;
             valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
             var allUsers = JSON.parse(localStorage.getItem("users"));
@@ -267,8 +251,6 @@ $(document).ready(function () {
             localStorage.setItem("users", JSON.stringify(allUsers));
         }
 
-
-
         function recordImport() {
             var valid = true;
             var entered = $("#textAr").val();
@@ -286,7 +268,6 @@ $(document).ready(function () {
             for (c = 0; c < fLen; c++) {
                 var thisUser = {};
                 var user = res[c].split("\t");
-
                 if (user[0]) {
                     thisUser.phone = user[0];
                 } else {
@@ -329,7 +310,6 @@ $(document).ready(function () {
                     tableRecordAppend(localStorage.userId, thisUser);
                     allUsers[localStorage.userId] = thisUser;
                     localStorage.setItem("users", JSON.stringify(allUsers));
-
                 } else {
                     return false;
                 }
@@ -370,7 +350,6 @@ $(document).ready(function () {
             $(':input', 'form').val('').removeAttr('checked').removeAttr('selected');
         }
         ;
-
         function eventViewIcon() {
             $(".view").click(function () {
                 var id = $(this).parents("tr").attr("id");
@@ -379,38 +358,6 @@ $(document).ready(function () {
             });
         }
         ;
-
-        function dialogView() {
-            $("#viewDiv").dialog({
-                autoOpen: false,
-                width: 420,
-                modal: true,
-                buttons: [
-                    {
-                        text: "Редактирай",
-                        icons: {
-                            primary: "ui-icon-pencil"
-                        },
-                        click: eventEditButton
-                    },
-                    {
-                        text: "Изтрий",
-                        icons: {
-                            primary: "ui-icon-trash"
-                        },
-                        click: eventDelButton
-                    },
-                    {
-                        text: "Отмени",
-                        icons: {
-                            primary: "ui-icon-cancel"
-                        },
-                        click: closeClear
-                    }
-                ]
-            });
-        }
-        
         function dialogDefault(tag, width) {
             $(tag).dialog({
                 autoOpen: false,
@@ -419,40 +366,52 @@ $(document).ready(function () {
             });
         }
 
-        function dialogAddEdit() {
-            var tag = "#addEditDiv";
+        function dialogView(tag) {
+            var element = '';
             dialogDefault(tag, 420);
-        }
-
-        function dialogImport() {
-            var tag = "#importDiv";
-            dialogDefault(tag, 600);
-            $(tag).dialog("option", "title", "Импортирай  записи");
-            $(tag).dialog("option", "height", 800);
             $(tag).dialog("option", "buttons",
                     [
-                        {
-                            text: "Запиши",
-                            icons: {
-                                primary: "ui-icon-check"
-                            },
-                            click: recordImport
-                        },
-                        {
-                            text: "Отмени",
-                            icons: {
-                                primary: "ui-icon-cancel"
-                            },
-                            click: closeClear
-                        }
+                        buttons("Редактирай", "ui-icon-pencil", eventEditButton(element)),
+                        buttons("Изтрий", "ui-icon-trash", eventDelButton),
+                        buttons("Отмени", "ui-icon-cancel", closeClear)
                     ]
                     );
         }
 
-        function eventImportButton() {
-            $("#importRec").click(function () {
+
+        function dialogAddEdit(tag) {
+            dialogDefault(tag, 420);
+        }
+
+        function dialogImport(tag) {
+            dialogDefault(tag, 600);
+            $(tag).dialog("option", "title", "Импортирай  записи");
+            $(tag).dialog("option", "height", 600);
+            $(tag).dialog("option", "buttons",
+                    [
+                        buttons("Запиши", "ui-icon-check", recordImport),
+                        buttons("Отмени", "ui-icon-cancel", closeClear)
+                    ]
+                    );
+
+        }
+
+        function eventImportButton(tag) {
+            $(tag).click(function () {
                 $("#importDiv").dialog("open");
             });
+        }
+
+        function buttons(text, icons, clickFunc) {
+            var buttons = {
+                text: text,
+                icons: {
+                    primary: icons
+                },
+                click: clickFunc
+            }
+            ;
+            return buttons;
         }
 
         function eventAddButton() {
@@ -461,46 +420,22 @@ $(document).ready(function () {
                 $("#addEditDiv").dialog("option", "title", "Нов запис");
                 $("#addEditDiv").dialog("option", "buttons",
                         [
-                            {
-                                text: "Добави",
-                                icons: {
-                                    primary: "ui-icon-check"
-                                },
-                                click: recordAdd
-                            },
-                            {
-                                text: "Отмени",
-                                icons: {
-                                    primary: "ui-icon-cancel"
-                                },
-                                click: closeClear
-                            }
+                            buttons("Добави", "ui-icon-check", recordAdd),
+                            buttons("Отмени", "ui-icon-cancel", closeClear)
                         ]
                         );
             });
         }
 
-        function eventEditButton() {
+        function eventEditButton(tag) {
             var id = localStorage.currentId;
             $(this).dialog("close");
-            $("#addEditDiv").dialog("open");
-            $("#addEditDiv").dialog("option", "title", "Редактирай запис");
-            $("#addEditDiv").dialog("option", "buttons",
+            $(tag).dialog("open");
+            $(tag).dialog("option", "title", "Редактирай запис");
+            $(tag).dialog("option", "buttons",
                     [
-                        {
-                            text: "Обнови",
-                            icons: {
-                                primary: "ui-icon-check"
-                            },
-                            click: eventUpdateButton
-                        },
-                        {
-                            text: "Отмени",
-                            icons: {
-                                primary: "ui-icon-cancel"
-                            },
-                            click: closeClear
-                        }
+                        buttons("Обнови", "ui-icon-check", eventUpdateButton),
+                        buttons("Отмени", "ui-icon-cancel", closeClear)
                     ]
                     );
             recordEdit(id);
@@ -535,13 +470,11 @@ $(document).ready(function () {
             });
             listAllUsers();
             eventAddButton();
-            eventImportButton();
-            dialogAddEdit();
-
-            dialogImport();
-            dialogView();
+            eventImportButton("#importRec");
+            dialogAddEdit("#addEditDiv");
+            dialogImport("#importDiv");
+            dialogView("#viewDiv");
             zodiacAutocomplete();
-
         }
         return {
             ready: function () {
@@ -549,7 +482,6 @@ $(document).ready(function () {
             }
         };
     };
-
     var proba = list();
     proba.ready();
 });
