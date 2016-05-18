@@ -1,13 +1,16 @@
 $(document).ready(function () {
-    var list = (function () {
+    var list = function () {
+        var tips = $(".validateTips");
         var allUsers = JSON.parse(localStorage.getItem("users"));
         var userrr = {};
-        var allUs = function () {
+
+        function listAllUsers() {
             for (userrr in allUsers) {
-                appendRecord(userrr, allUsers[userrr]);
-                //testing();
+                tableRecordAppend(userrr, allUsers[userrr]);
             }
-        };
+        }
+        ;
+
         function clickCounter() {
             if (typeof (Storage) !== "undefined") {
                 if (localStorage.userId) {
@@ -37,15 +40,31 @@ $(document).ready(function () {
                     .replace(/&amp;/g, '&');
         }
 
-        function viewEvent() {
-            $(".view").click(function () {
-                var id = $(this).parents("tr").attr("id");
-                $("#viewDiv").dialog("open");
-                viewRec(id);
-            });
+        function eventDelButton() {
+            var id = localStorage.currentId;
+            $(this).dialog("close");
+            $("tr#" + id + "").remove();
+            recordRemove(id);
         }
 
-        function editEvent() {
+        function eventUpdateButton() {
+            var id = localStorage.currentId;
+            var valid = recordUpdate(id);
+            if (valid) {
+                $(this).dialog("close");
+            }
+            clearData();
+        }
+
+        function closeClear() {
+            if (tips.text !== "") {
+                tips.text("");
+            }
+            $(this).dialog("close");
+            clearData();
+        }
+
+        function eventEditIcon() {
             $(".edit").click(function () {
                 var id = $(this).parents("tr").attr("id");
                 $("#addEditDiv").dialog("open");
@@ -57,36 +76,26 @@ $(document).ready(function () {
                                 icons: {
                                     primary: "ui-icon-check"
                                 },
-                                click: function () {
-                                    var id = localStorage.currentId;
-                                    var valid = updateRec(id);
-                                    if (valid) {
-                                        $(this).dialog("close");
-                                    }
-                                    clearData();
-                                }
+                                click: eventUpdateButton
                             },
                             {
                                 text: "Отмени",
                                 icons: {
                                     primary: "ui-icon-cancel"
                                 },
-                                click: function () {
-                                    $(this).dialog("close");
-                                    clearData();
-                                }
+                                click: closeClear
                             }
                         ]
                         );
-                editRec(id);
+                recordEdit(id);
             });
         }
 
-        function trashEvent() {
+        function eventTrashIcon() {
             $(".trash").click(function () {
                 var id = $(this).parents("tr").attr("id");
                 $("#" + id + "").remove();
-                removeRec(id);
+                recordRemove(id);
             });
         }
 
@@ -125,19 +134,17 @@ $(document).ready(function () {
             valid = valid && checkLength(note, "Бележки", 0, 500);
             return valid;
         }
-        function testing() {
-            alert(543543);
-        }
-        function appendRecord(rowId, fields, edit) {
+
+        function tableRecordAppend(rowId, fields, edit) {
             if (edit !== undefined) {
-                $("tr#" + rowId + "").replaceWith(appending(fields));
+                $("tr#" + rowId + "").replaceWith(appending(fields, rowId));
             } else {
                 $("#phoneTable tbody").append(appending(fields, rowId));
             }
             ;
-            viewEvent();
-            editEvent();
-            trashEvent();
+            eventViewIcon();
+            eventEditIcon();
+            eventTrashIcon();
         }
 
         function appending(fields, rowId) {
@@ -157,7 +164,7 @@ $(document).ready(function () {
         }
         ;
 
-        function addRecord() {
+        function recordAdd() {
             var valid = true;
             var thisUser = {};
             thisUser.phone = htmlEscape($("#phone").val());
@@ -185,14 +192,14 @@ $(document).ready(function () {
             if (valid) {
                 clickCounter();
                 allUsers[localStorage.userId] = thisUser;
-                appendRecord(localStorage.userId, thisUser);
+                tableRecordAppend(localStorage.userId, thisUser);
                 $(this).dialog("close");
                 localStorage.setItem("users", JSON.stringify(allUsers));
                 clearData();
             }
         }
         ;
-        function viewRec(id) {
+        function recordView(id) {
             var allUsers = JSON.parse(localStorage.getItem("users"));
             localStorage.currentId = id;
             var phone = htmlUnescape(allUsers[id].phone);
@@ -209,7 +216,7 @@ $(document).ready(function () {
             $("#viewDiv #note").text(note);
         }
 
-        function editRec(id) {
+        function recordEdit(id) {
             var allUsers = JSON.parse(localStorage.getItem("users"));
             localStorage.currentId = id;
             var phone = allUsers[id].phone;
@@ -226,7 +233,7 @@ $(document).ready(function () {
             $("#addEditDiv #note").val(note);
         }
 
-        function updateRec(id) {
+        function recordUpdate(id) {
             var thisUser = {};
             thisUser.phone = htmlEscape($("#addEditDiv #phone").val());
             thisUser.name = htmlEscape($("#addEditDiv #name").val());
@@ -245,7 +252,7 @@ $(document).ready(function () {
             }
 
             if (valid) {
-                appendRecord(id, thisUser, true);
+                tableRecordAppend(id, thisUser, true);
                 allUsers[id] = thisUser;
                 localStorage.setItem("users", JSON.stringify(allUsers));
                 return true;
@@ -254,247 +261,82 @@ $(document).ready(function () {
             }
         }
 
-        function removeRec(id) {
+        function recordRemove(id) {
             var allUsers = JSON.parse(localStorage.getItem("users"));
             delete allUsers[id];
             localStorage.setItem("users", JSON.stringify(allUsers));
         }
 
-        $("#addEditDiv").dialog({autoOpen: false});
-        $("#addRec").click(function () {
-            $("#addEditDiv").dialog("open");
-            $("#addEditDiv").dialog("option", "title", "Нов запис");
-            $("#addEditDiv").dialog("option", "buttons",
-                    [
-                        {
-                            text: "Добави",
-                            icons: {
-                                primary: "ui-icon-check"
-                            },
-                            click: addRecord
-                        },
-                        {
-                            text: "Отмени",
-                            icons: {
-                                primary: "ui-icon-cancel"
-                            },
-                            click: function () {
-                                if (tips.text !== "") {
-                                    tips.text("");
-                                }
-                                $(this).dialog("close");
-                            }
-                        }
-                    ]
-                    );
-        });
 
-        $("#importRec").click(function () {
-            $("#importDiv").dialog("open");
-        });
 
-        $("#clearLS").click(function () {
-            localStorage.clear();
-        });
+        function recordImport() {
+            var valid = true;
+            var entered = $("#textAr").val();
+            if (!entered) {
+                updateTips("Моля, въведете данни.");
+                return valid = false;
+            }
+            var res = entered.match(/.+$/gm);
+            var allUsers = JSON.parse(localStorage.getItem("users"));
+            if (!allUsers) {
+                var allUsers = {};
+            }
+            var fLen = res.length;
+            var c = 0;
+            for (c = 0; c < fLen; c++) {
+                var thisUser = {};
+                var user = res[c].split("\t");
 
-        $("#addEditDiv").dialog({
-            autoOpen: false,
-            width: 420,
-            modal: true
-        });
-
-        $("#viewDiv").dialog({
-            autoOpen: false,
-            width: 420,
-            modal: true,
-            buttons: [
-                {
-                    text: "Редактирай",
-                    icons: {
-                        primary: "ui-icon-pencil"
-                    },
-                    click: function () {
-                        var id = localStorage.currentId;
-                        $(this).dialog("close");
-                        $("#addEditDiv").dialog("open");
-                        $("#addEditDiv").dialog("option", "title", "Редактирай запис");
-                        $("#addEditDiv").dialog("option", "buttons",
-                                [
-                                    {
-                                        text: "Обнови",
-                                        icons: {
-                                            primary: "ui-icon-check"
-                                        },
-                                        click: function () {
-                                            var id = localStorage.currentId;
-                                            var valid = updateRec(id);
-                                            if (valid) {
-                                                $(this).dialog("close");
-                                            }
-                                            clearData();
-                                        }
-                                    },
-                                    {
-                                        text: "Отмени",
-                                        icons: {
-                                            primary: "ui-icon-cancel"
-                                        },
-                                        click: function () {
-                                            if (tips.text !== "") {
-                                                tips.text("");
-                                            }
-                                            $(this).dialog("close");
-                                            clearData();
-                                        }
-                                    }
-                                ]
-                                );
-                        editRec(id);
-                    }
-                },
-                {
-                    text: "Изтрий",
-                    icons: {
-                        primary: "ui-icon-trash"
-                    },
-                    click: function () {
-                        var id = localStorage.currentId;
-                        $(this).dialog("close");
-                        $("tr#" + id + "").remove();
-                        removeRec(id);
-                    }
-                },
-                {
-                    text: "Отмени",
-                    icons: {
-                        primary: "ui-icon-cancel"
-                    },
-                    click: function () {
-                        if (tips.text !== "") {
-                            tips.text("");
-                        }
-                        $(this).dialog("close");
-                    }
+                if (user[0]) {
+                    thisUser.phone = user[0];
+                } else {
+                    thisUser.phone = "";
                 }
-            ]
-        });
-
-        $("#importDiv").dialog({
-            autoOpen: false,
-            height: 600,
-            width: 800,
-            modal: true,
-            buttons: [
-                {
-                    text: "Запиши",
-                    icons: {
-                        primary: "ui-icon-check"
-                    },
-                    click: function () {
-                        var valid = true;
-                        var entered = $("#textAr").val();
-                        if (!entered) {
-
-                            updateTips("Моля, въведете данни.");
-                            return valid = false;
-                        }
-                        var res = entered.match(/.+$/gm);
-                        var allUsers = JSON.parse(localStorage.getItem("users"));
-                        if (!allUsers) {
-                            var allUsers = {};
-                        }
-                        var fLen = res.length;
-                        var c = 0;
-                        for (c = 0; c < fLen; c++) {
-                            var thisUser = {};
-                            var user = res[c].split("\t");
-
-                            if (user[0]) {
-                                thisUser.phone = user[0];
-                            } else {
-                                thisUser.phone = "";
-                            }
-                            if (user[1]) {
-                                thisUser.name = user[1];
-                            } else {
-                                thisUser.name = "";
-                            }
-                            if (user[2]) {
-                                thisUser.place = user[2];
-                            } else {
-                                thisUser.place = "";
-                            }
-                            if (user[3]) {
-                                thisUser.gender = user[3];
-                            } else {
-                                thisUser.gender = "";
-                            }
-                            if (user[4]) {
-                                thisUser.zodiac = user[4];
-                            } else {
-                                thisUser.zodiac = "";
-                            }
-                            if (user[5]) {
-                                thisUser.note = user[5];
-                            } else {
-                                thisUser.note = "";
-                            }
-
-                            valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
-                            if (valid && allUsers) {
-                                valid = phoneNameCheck(allUsers, thisUser);
-                            } else {
-                                var allUsers = {};
-                            }
-                            if (valid) {
-                                clickCounter();
-                                appendRecord(localStorage.userId, thisUser);
-                                allUsers[localStorage.userId] = thisUser;
-                                localStorage.setItem("users", JSON.stringify(allUsers));
-
-                            } else {
-                                return false;
-                            }
-                        }
-                        localStorage.setItem("users", JSON.stringify(allUsers));
-                        $(this).dialog("close");
-                    }
-                },
-                {
-                    text: "Отмени",
-                    icons: {
-                        primary: "ui-icon-cancel"
-                    },
-                    click: function () {
-                        if (tips.text !== "") {
-                            tips.text("");
-                        }
-                        $(this).dialog("close");
-                    }
+                if (user[1]) {
+                    thisUser.name = user[1];
+                } else {
+                    thisUser.name = "";
                 }
-            ]
-        });
-        $("#importDiv").dialog("option", "title", "Импортирай  записи");
+                if (user[2]) {
+                    thisUser.place = user[2];
+                } else {
+                    thisUser.place = "";
+                }
+                if (user[3]) {
+                    thisUser.gender = user[3];
+                } else {
+                    thisUser.gender = "";
+                }
+                if (user[4]) {
+                    thisUser.zodiac = user[4];
+                } else {
+                    thisUser.zodiac = "";
+                }
+                if (user[5]) {
+                    thisUser.note = user[5];
+                } else {
+                    thisUser.note = "";
+                }
 
-        $(function () {
-            var availableTags = [
-                "Овен",
-                "Телец",
-                "Близнаци",
-                "Рак",
-                "Лъв",
-                "Дева",
-                "Везни",
-                "Скорпион",
-                "Стрелец",
-                "Козирог",
-                "Водолей",
-                "Риби"
-            ];
-            $("#zodiac").autocomplete({
-                source: availableTags
-            });
-        });
+                valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
+                if (valid && allUsers) {
+                    valid = phoneNameCheck(allUsers, thisUser);
+                } else {
+                    var allUsers = {};
+                }
+                if (valid) {
+                    clickCounter();
+                    tableRecordAppend(localStorage.userId, thisUser);
+                    allUsers[localStorage.userId] = thisUser;
+                    localStorage.setItem("users", JSON.stringify(allUsers));
+
+                } else {
+                    return false;
+                }
+            }
+            localStorage.setItem("users", JSON.stringify(allUsers));
+            $(this).dialog("close");
+        }
 
         function checkLength(o, n, min, max) {
             if (o.length > max || o.length < min) {
@@ -514,7 +356,6 @@ $(document).ready(function () {
                 return true;
             }
         }
-        var tips = $(".validateTips");
 
         function updateTips(t) {
             tips
@@ -524,22 +365,191 @@ $(document).ready(function () {
                 tips.removeClass("bg-danger", 1500);
             }, 500);
         }
+
         function clearData() {
             $(':input', 'form').val('').removeAttr('checked').removeAttr('selected');
         }
         ;
-        
-        allUs();
-        
-        return {
-            listing: function () {
-                
-            },
-            adpending: function () {
 
+        function eventViewIcon() {
+            $(".view").click(function () {
+                var id = $(this).parents("tr").attr("id");
+                $("#viewDiv").dialog("open");
+                recordView(id);
+            });
+        }
+        ;
+
+        function dialogView() {
+            $("#viewDiv").dialog({
+                autoOpen: false,
+                width: 420,
+                modal: true,
+                buttons: [
+                    {
+                        text: "Редактирай",
+                        icons: {
+                            primary: "ui-icon-pencil"
+                        },
+                        click: eventEditButton
+                    },
+                    {
+                        text: "Изтрий",
+                        icons: {
+                            primary: "ui-icon-trash"
+                        },
+                        click: eventDelButton
+                    },
+                    {
+                        text: "Отмени",
+                        icons: {
+                            primary: "ui-icon-cancel"
+                        },
+                        click: closeClear
+                    }
+                ]
+            });
+        }
+        
+        function dialogDefault(tag, width) {
+            $(tag).dialog({
+                autoOpen: false,
+                modal: true,
+                width: width
+            });
+        }
+
+        function dialogAddEdit() {
+            var tag = "#addEditDiv";
+            dialogDefault(tag, 420);
+        }
+
+        function dialogImport() {
+            var tag = "#importDiv";
+            dialogDefault(tag, 600);
+            $(tag).dialog("option", "title", "Импортирай  записи");
+            $(tag).dialog("option", "height", 800);
+            $(tag).dialog("option", "buttons",
+                    [
+                        {
+                            text: "Запиши",
+                            icons: {
+                                primary: "ui-icon-check"
+                            },
+                            click: recordImport
+                        },
+                        {
+                            text: "Отмени",
+                            icons: {
+                                primary: "ui-icon-cancel"
+                            },
+                            click: closeClear
+                        }
+                    ]
+                    );
+        }
+
+        function eventImportButton() {
+            $("#importRec").click(function () {
+                $("#importDiv").dialog("open");
+            });
+        }
+
+        function eventAddButton() {
+            $("#addRec").click(function () {
+                $("#addEditDiv").dialog("open");
+                $("#addEditDiv").dialog("option", "title", "Нов запис");
+                $("#addEditDiv").dialog("option", "buttons",
+                        [
+                            {
+                                text: "Добави",
+                                icons: {
+                                    primary: "ui-icon-check"
+                                },
+                                click: recordAdd
+                            },
+                            {
+                                text: "Отмени",
+                                icons: {
+                                    primary: "ui-icon-cancel"
+                                },
+                                click: closeClear
+                            }
+                        ]
+                        );
+            });
+        }
+
+        function eventEditButton() {
+            var id = localStorage.currentId;
+            $(this).dialog("close");
+            $("#addEditDiv").dialog("open");
+            $("#addEditDiv").dialog("option", "title", "Редактирай запис");
+            $("#addEditDiv").dialog("option", "buttons",
+                    [
+                        {
+                            text: "Обнови",
+                            icons: {
+                                primary: "ui-icon-check"
+                            },
+                            click: eventUpdateButton
+                        },
+                        {
+                            text: "Отмени",
+                            icons: {
+                                primary: "ui-icon-cancel"
+                            },
+                            click: closeClear
+                        }
+                    ]
+                    );
+            recordEdit(id);
+        }
+
+        function zodiacAutocomplete() {
+            $(function () {
+                var availableTags = [
+                    "Овен",
+                    "Телец",
+                    "Близнаци",
+                    "Рак",
+                    "Лъв",
+                    "Дева",
+                    "Везни",
+                    "Скорпион",
+                    "Стрелец",
+                    "Козирог",
+                    "Водолей",
+                    "Риби"
+                ];
+                $("#zodiac").autocomplete({
+                    source: availableTags
+                });
+            });
+        }
+
+
+        function onReady() {
+            $("#clearLS").click(function () {
+                localStorage.clear();
+            });
+            listAllUsers();
+            eventAddButton();
+            eventImportButton();
+            dialogAddEdit();
+
+            dialogImport();
+            dialogView();
+            zodiacAutocomplete();
+
+        }
+        return {
+            ready: function () {
+                onReady();
             }
         };
-    })();
-    
-    
+    };
+
+    var proba = list();
+    proba.ready();
 });
