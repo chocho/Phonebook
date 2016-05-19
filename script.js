@@ -1,13 +1,34 @@
 $(document).ready(function () {
-    var list = function () {
+    ///////////////
+    var phonebook = function () {
         var tips = $(".validateTips");
         var user = {};
+        var properties = ["phone", "name", "place", "gender", "zodiac", "note"];
 
-        function fetchUsers(param) {
-            var users = JSON.parse(localStorage.getItem(param));
+        /**
+         * Fetches all users , stored in LocalStorage.
+         * @param {String} item - Item for fetching.
+         * @return {Object} users -  All users, stored in objects of an object.
+         */
+        function fetchUsers(item) {
+            var users = JSON.parse(localStorage.getItem(item));
             return users;
         }
 
+        /**
+         * Set stringified user objects in LocalStorage .
+         * @param {String} localStItem - A name for storing in LocalStorage.
+         * @param {String} item - Item to be stored.
+         */
+        function setUsers(localStItem, item) {
+            localStorage.setItem(localStItem, JSON.stringify(item));
+        }
+
+        /**
+         * Fetching all users from LocalStorage and listing them in a table .
+         * @param {String} localStItem - A name for storing in LocalStorage.
+         * @param {String} item - Item to be stored.
+         */
         function listAllUsers() {
             var allUsers = fetchUsers("users");
             for (user in allUsers) {
@@ -44,12 +65,15 @@ $(document).ready(function () {
                     .replace(/&amp;/g, '&');
         }
 
-        function closeClear() {
+        function closeClearData() {
+            $(this).dialog("close");
+            clearData();
+            clearTips();
+        }
+        function clearTips() {
             if (tips.text !== "") {
                 tips.text("");
             }
-            $(this).dialog("close");
-            clearData();
         }
 
         function eventDelButton() {
@@ -142,6 +166,9 @@ $(document).ready(function () {
 
         function appending(fields, rowId) {
             var field = "";
+            var imgCell = "<img  class='view' src='images/view.png' width='25' height='25' alt='View icon' title='Виж запис' />";
+            var editCell = "<img  class='edit' src='images/edit.png' width='25' height='25' alt='Edit icon' title='Редактирай запис' />";
+            var trashCell = "<img  class='trash' src='images/trash.png' width='25' height='25' alt='Delete icon' title='Изтрий запис' />";
             var row = "<tr class='row' id='" + rowId + "'>";
             for (field in fields) {
                 if (field === "note") {
@@ -149,30 +176,15 @@ $(document).ready(function () {
                 }
                 row += "<td>" + fields[field] + "</td>";
             }
-            row += "<td><img  class='view' src='images/view.png' width='25' height='25' alt='View icon' title='Виж запис' />" +
-                    "<img  class='edit' src='images/edit.png' width='25' height='25' alt='Edit icon' title='Редактирай запис' />" +
-                    "<img  class='trash' src='images/trash.png' width='25' height='25' alt='Delete icon' title='Изтрий запис' /></td>" +
-                    "</tr>";
+            row += "<td>" + imgCell + editCell + trashCell + "</td></tr>";
             return row;
         }
 
         function recordAdd() {
             var valid = true;
             var thisUser = {};
-            var prop = 0;
-            var masiv = ["phone", "name", "place", "gender", "zodiac", "note"];
-            var length = masiv.length;
-            for (prop = 0; prop < length; prop++) {
-                var test = masiv[prop];
-                thisUser[test] = htmlEscape($("#" + masiv[prop] + "").val());
-            }
-            /*thisUser.phone = htmlEscape($("#phone").val());
-             thisUser.name = htmlEscape($("#name").val());
-             thisUser.place = htmlEscape($("#place").val());
-             thisUser.gender = htmlEscape($("#gender").val());
-             thisUser.zodiac = htmlEscape($("#zodiac").val());
-             thisUser.note = htmlEscape($("#note").val());*/
             var char = "";
+            thisUser = foreachUser(htmlEscape, thisUser, properties);
             for (char in thisUser) {
                 if (char === undefined) {
                     char = "";
@@ -184,7 +196,7 @@ $(document).ready(function () {
             if (valid && allUsers) {
                 valid = phoneNameCheck(allUsers, thisUser);
             } else {
-                var allUsers = {};
+                allUsers = {};
             }
 
             if (valid) {
@@ -192,66 +204,70 @@ $(document).ready(function () {
                 allUsers[localStorage.userId] = thisUser;
                 tableRecordAppend(localStorage.userId, thisUser);
                 $(this).dialog("close");
-                localStorage.setItem("users", JSON.stringify(allUsers));
+                setUsers("users", allUsers);
                 clearData();
+                clearTips();
+            }
+        }
+
+        function  recordViewEditDef(id, mode) {
+            var allUsers = fetchUsers("users");
+            localStorage.currentId = id;
+            var currentUser = allUsers[id];
+            var prop = 0;
+            var arr = properties;
+            var property = '';
+            var selector = '';
+            var currProperty = '';
+            for (prop; prop < arr.length; prop++) {
+                currProperty = arr[prop];
+                property = htmlUnescape(currentUser[currProperty]);
+
+                if (mode === "view") {
+                    selector = "#" + mode + "-" + currProperty;
+                    $(selector).text(property);
+                } else {
+                    selector = "#" + currProperty;
+                    $(selector).val(property);
+                }
             }
         }
 
         function recordView(id) {
-            var allUsers = fetchUsers("users");
-            localStorage.currentId = id;
-            var phone = htmlUnescape(allUsers[id].phone);
-            var name = htmlUnescape(allUsers[id].name);
-            var place = htmlUnescape(allUsers[id].place);
-            var gender = htmlUnescape(allUsers[id].gender);
-            var zodiac = htmlUnescape(allUsers[id].zodiac);
-            var note = htmlUnescape(allUsers[id].note);
-            $("#viewDiv #phone").text(phone);
-            $("#viewDiv #name").text(name);
-            $("#viewDiv #place").text(place);
-            $("#viewDiv #gender").text(gender);
-            $("#viewDiv #zodiac").text(zodiac);
-            $("#viewDiv #note").text(note);
+            recordViewEditDef(id, "view");
         }
 
         function recordEdit(id) {
-            var allUsers = fetchUsers("users");
-            localStorage.currentId = id;
-            var phone = allUsers[id].phone;
-            var name = htmlUnescape(allUsers[id].name);
-            var place = allUsers[id].place;
-            var gender = allUsers[id].gender;
-            var zodiac = allUsers[id].zodiac;
-            var note = allUsers[id].note;
-            $("#addEditDiv #phone").val(phone);
-            $("#addEditDiv #name").val(name);
-            $("#addEditDiv #place").val(place);
-            $("#addEditDiv #gender").val(gender);
-            $("#addEditDiv #zodiac").val(zodiac);
-            $("#addEditDiv #note").val(note);
+            recordViewEditDef(id, "");
         }
 
+        function foreachUser(func, userObject, properties) {
+            var prop = 0;
+            var arr = properties;
+            for (prop; prop < arr.length; prop++) {
+                var property = arr[prop];
+                var selector = "#" + property + "";
+                userObject[property] = func($(selector).val());
+            }
+            return userObject;
+
+        }
         function recordUpdate(id) {
-            var thisUser = {};
-            thisUser.phone = htmlEscape($("#addEditDiv #phone").val());
-            thisUser.name = htmlEscape($("#addEditDiv #name").val());
-            thisUser.place = htmlEscape($("#addEditDiv #place").val());
-            thisUser.gender = htmlEscape($("#addEditDiv #gender").val());
-            thisUser.zodiac = htmlEscape($("#addEditDiv #zodiac").val());
-            thisUser.note = htmlEscape($("#addEditDiv #note").val());
             var valid = true;
+            var thisUser = {};
+            thisUser = foreachUser(htmlEscape, thisUser, properties);
             valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
             var allUsers = fetchUsers("users");
             if (valid && allUsers) {
                 valid = phoneNameCheck(allUsers, thisUser, id);
             } else {
-                var allUsers = {};
+                allUsers = {};
             }
-
             if (valid) {
                 tableRecordAppend(id, thisUser, true);
                 allUsers[id] = thisUser;
-                localStorage.setItem("users", JSON.stringify(allUsers));
+                setUsers("users", allUsers);
+                clearTips();
                 return true;
             } else {
                 return false;
@@ -261,7 +277,7 @@ $(document).ready(function () {
         function recordRemove(id) {
             var allUsers = fetchUsers("users");
             delete allUsers[id];
-            localStorage.setItem("users", JSON.stringify(allUsers));
+            setUsers("users", allUsers);
         }
 
         function recordImport() {
@@ -322,12 +338,13 @@ $(document).ready(function () {
                     idCounter();
                     tableRecordAppend(localStorage.userId, thisUser);
                     allUsers[localStorage.userId] = thisUser;
-                    localStorage.setItem("users", JSON.stringify(allUsers));
+                    setUsers("users", allUsers);
+                    clearTips();
                 } else {
                     return false;
                 }
             }
-            localStorage.setItem("users", JSON.stringify(allUsers));
+            setUsers("users", allUsers);
             $(this).dialog("close");
         }
 
@@ -375,7 +392,7 @@ $(document).ready(function () {
         function buttons(text, icons, clickFunc) {
             if (text === "Отмени") {
                 icons = "ui-icon-cancel";
-                clickFunc = closeClear;
+                clickFunc = closeClearData;
             }
             var button = {
                 text: text,
@@ -408,7 +425,6 @@ $(document).ready(function () {
                     ]
                     );
         }
-
 
         function dialogAddEdit(selector, width, height, title) {
             dialogDefault(selector, width, height, title);
@@ -499,6 +515,6 @@ $(document).ready(function () {
             }
         };
     };
-    var proba = list();
-    proba.ready();
+    var list = phonebook();
+    list.ready();
 });
