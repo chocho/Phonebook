@@ -1,15 +1,23 @@
 $(document).ready(function () {
     var list = function () {
         var tips = $(".validateTips");
-        var allUsers = JSON.parse(localStorage.getItem("users"));
-        var userrr = {};
+        var user = {};
+
+        function fetchUsers(param) {
+            var users = JSON.parse(localStorage.getItem(param));
+            return users;
+        }
+        
         function listAllUsers() {
-            for (userrr in allUsers) {
-                tableRecordAppend(userrr, allUsers[userrr]);
+            var allUsers = fetchUsers("users");
+            for (user in allUsers) {
+                tableRecordAppend(user, allUsers[user]);
             }
         }
-        ;
-        function clickCounter() {
+
+
+
+        function idCounter() {
             if (typeof (Storage) !== "undefined") {
                 if (localStorage.userId) {
                     localStorage.userId = Number(localStorage.userId) + 1;
@@ -38,6 +46,14 @@ $(document).ready(function () {
                     .replace(/&amp;/g, '&');
         }
 
+        function closeClear() {
+            if (tips.text !== "") {
+                tips.text("");
+            }
+            $(this).dialog("close");
+            clearData();
+        }
+
         function eventDelButton() {
             var id = localStorage.currentId;
             $(this).dialog("close");
@@ -50,27 +66,19 @@ $(document).ready(function () {
             var valid = recordUpdate(id);
             if (valid) {
                 $(this).dialog("close");
+                clearData();
             }
-            clearData();
         }
 
-        function closeClear() {
-            if (tips.text !== "") {
-                tips.text("");
-            }
-            $(this).dialog("close");
-            clearData();
-        }
-
-        function eventEditIcon() {
-            $(".edit").click(function () {
+        function eventEditIcon(click, openDiv) {
+            $(click).click(function () {
                 var id = $(this).parents("tr").attr("id");
-                $("#addEditDiv").dialog("open");
-                $("#addEditDiv").dialog("option", "title", "Редактирай запис");
-                $("#addEditDiv").dialog("option", "buttons",
+                $(openDiv).dialog("open");
+                $(openDiv).dialog("option", "title", "Редактирай запис");
+                $(openDiv).dialog("option", "buttons",
                         [
                             buttons("Обнови", "ui-icon-check", eventUpdateButton),
-                            buttons("Отмени", "ui-icon-cancel", closeClear)
+                            buttons("Отмени")
                         ]
                         );
 
@@ -78,8 +86,8 @@ $(document).ready(function () {
             });
         }
 
-        function eventTrashIcon() {
-            $(".trash").click(function () {
+        function eventTrashIcon(click) {
+            $(click).click(function () {
                 var id = $(this).parents("tr").attr("id");
                 $("#" + id + "").remove();
                 recordRemove(id);
@@ -87,19 +95,19 @@ $(document).ready(function () {
         }
 
         function phoneNameCheck(restoredUsers, assignedUser, id) {
-            var userrr = {};
+            var user = {};
             var currentPhone = "";
             var currentName = "";
-            for (userrr in restoredUsers) {
+            for (user in restoredUsers) {
                 if (id !== undefined) {
-                    if (userrr === id) {
+                    if (user === id) {
                         continue;
                     }
                 } else {
                     id = 0;
                 }
-                currentPhone = restoredUsers[userrr].phone;
-                currentName = restoredUsers[userrr].name;
+                currentPhone = restoredUsers[user].phone;
+                currentName = restoredUsers[user].name;
                 if (currentPhone === assignedUser.phone) {
                     updateTips("Телефон " + currentPhone + " вече съществува.");
                     return  false;
@@ -129,9 +137,9 @@ $(document).ready(function () {
                 $("#phoneTable tbody").append(appending(fields, rowId));
             }
             ;
-            eventViewIcon();
-            eventEditIcon();
-            eventTrashIcon();
+            eventViewIcon(".view", "#viewDiv");
+            eventEditIcon(".edit", "#addEditDiv");
+            eventTrashIcon(".trash");
         }
 
         function appending(fields, rowId) {
@@ -167,7 +175,9 @@ $(document).ready(function () {
             }
 
             valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
-            var allUsers = JSON.parse(localStorage.getItem("users"));
+            //var allUsers = fetchUsers("users");
+            var allUsers = fetchUsers("users");
+
             if (valid && allUsers) {
                 valid = phoneNameCheck(allUsers, thisUser);
             } else {
@@ -175,7 +185,7 @@ $(document).ready(function () {
             }
 
             if (valid) {
-                clickCounter();
+                idCounter();
                 allUsers[localStorage.userId] = thisUser;
                 tableRecordAppend(localStorage.userId, thisUser);
                 $(this).dialog("close");
@@ -183,9 +193,9 @@ $(document).ready(function () {
                 clearData();
             }
         }
-        ;
+
         function recordView(id) {
-            var allUsers = JSON.parse(localStorage.getItem("users"));
+            var allUsers = fetchUsers("users");
             localStorage.currentId = id;
             var phone = htmlUnescape(allUsers[id].phone);
             $("#viewDiv #phone").text(phone);
@@ -202,7 +212,7 @@ $(document).ready(function () {
         }
 
         function recordEdit(id) {
-            var allUsers = JSON.parse(localStorage.getItem("users"));
+            var allUsers = fetchUsers("users");
             localStorage.currentId = id;
             var phone = allUsers[id].phone;
             $("#addEditDiv #phone").val(phone);
@@ -228,7 +238,7 @@ $(document).ready(function () {
             thisUser.note = htmlEscape($("#addEditDiv #note").val());
             var valid = true;
             valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
-            var allUsers = JSON.parse(localStorage.getItem("users"));
+            var allUsers = fetchUsers("users");
             if (valid && allUsers) {
                 valid = phoneNameCheck(allUsers, thisUser, id);
             } else {
@@ -246,7 +256,7 @@ $(document).ready(function () {
         }
 
         function recordRemove(id) {
-            var allUsers = JSON.parse(localStorage.getItem("users"));
+            var allUsers = fetchUsers("users");
             delete allUsers[id];
             localStorage.setItem("users", JSON.stringify(allUsers));
         }
@@ -259,7 +269,7 @@ $(document).ready(function () {
                 return valid = false;
             }
             var res = entered.match(/.+$/gm);
-            var allUsers = JSON.parse(localStorage.getItem("users"));
+            var allUsers = fetchUsers("users");
             if (!allUsers) {
                 var allUsers = {};
             }
@@ -306,7 +316,7 @@ $(document).ready(function () {
                     var allUsers = {};
                 }
                 if (valid) {
-                    clickCounter();
+                    idCounter();
                     tableRecordAppend(localStorage.userId, thisUser);
                     allUsers[localStorage.userId] = thisUser;
                     localStorage.setItem("users", JSON.stringify(allUsers));
@@ -350,98 +360,104 @@ $(document).ready(function () {
             $(':input', 'form').val('').removeAttr('checked').removeAttr('selected');
         }
         ;
-        function eventViewIcon() {
-            $(".view").click(function () {
+
+        function eventViewIcon(click, openDiv) {
+            $(click).click(function () {
                 var id = $(this).parents("tr").attr("id");
-                $("#viewDiv").dialog("open");
+                $(openDiv).dialog("open");
                 recordView(id);
-            });
-        }
-        ;
-        function dialogDefault(tag, width) {
-            $(tag).dialog({
-                autoOpen: false,
-                modal: true,
-                width: width
-            });
-        }
-
-        function dialogView(tag) {
-            var element = '';
-            dialogDefault(tag, 420);
-            $(tag).dialog("option", "buttons",
-                    [
-                        buttons("Редактирай", "ui-icon-pencil", eventEditButton(element)),
-                        buttons("Изтрий", "ui-icon-trash", eventDelButton),
-                        buttons("Отмени", "ui-icon-cancel", closeClear)
-                    ]
-                    );
-        }
-
-
-        function dialogAddEdit(tag) {
-            dialogDefault(tag, 420);
-        }
-
-        function dialogImport(tag) {
-            dialogDefault(tag, 600);
-            $(tag).dialog("option", "title", "Импортирай  записи");
-            $(tag).dialog("option", "height", 600);
-            $(tag).dialog("option", "buttons",
-                    [
-                        buttons("Запиши", "ui-icon-check", recordImport),
-                        buttons("Отмени", "ui-icon-cancel", closeClear)
-                    ]
-                    );
-
-        }
-
-        function eventImportButton(tag) {
-            $(tag).click(function () {
-                $("#importDiv").dialog("open");
             });
         }
 
         function buttons(text, icons, clickFunc) {
-            var buttons = {
+            if (text === "Отмени") {
+                icons = "ui-icon-cancel";
+                clickFunc = closeClear;
+            }
+            var button = {
                 text: text,
                 icons: {
                     primary: icons
                 },
                 click: clickFunc
-            }
-            ;
-            return buttons;
+
+            };
+            return button;
         }
 
-        function eventAddButton() {
-            $("#addRec").click(function () {
-                $("#addEditDiv").dialog("open");
-                $("#addEditDiv").dialog("option", "title", "Нов запис");
-                $("#addEditDiv").dialog("option", "buttons",
+        function dialogDefault(selector, width, height, title) {
+            $(selector).dialog({
+                autoOpen: false,
+                modal: true,
+                width: width,
+                height: height,
+                title: title
+            });
+        }
+
+        function dialogView(selector, width, height, title) {
+            dialogDefault(selector, width, height, title);
+            $(selector).dialog("option", "buttons",
+                    [
+                        buttons("Редактирай", "ui-icon-pencil", eventEditButton),
+                        buttons("Изтрий", "ui-icon-trash", eventDelButton),
+                        buttons("Отмени")
+                    ]
+                    );
+        }
+
+
+        function dialogAddEdit(selector, width, height, title) {
+            dialogDefault(selector, width, height, title);
+        }
+
+        function dialogImport(selector, width, height, title) {
+            dialogDefault(selector, width, height, title);
+            //$(selector).dialog("option", "height", height);
+            $(selector).dialog("option", "buttons",
+                    [
+                        buttons("Запиши", "ui-icon-check", recordImport),
+                        buttons("Отмени")
+                    ]
+                    );
+
+        }
+
+        function eventImportButton(clickBut, openDiv) {
+            $(clickBut).click(function () {
+                $(openDiv).dialog("open");
+            });
+        }
+
+        function eventAddButton(clickBut, openDiv, title) {
+            $(clickBut).click(function () {
+                $(openDiv).dialog("open");
+                $(openDiv).dialog("option", "title", title);
+                $(openDiv).dialog("option", "buttons",
                         [
                             buttons("Добави", "ui-icon-check", recordAdd),
-                            buttons("Отмени", "ui-icon-cancel", closeClear)
+                            buttons("Отмени")
                         ]
                         );
             });
         }
 
-        function eventEditButton(tag) {
+        function eventEditButton() {
+            var selector = "#addEditDiv";
             var id = localStorage.currentId;
             $(this).dialog("close");
-            $(tag).dialog("open");
-            $(tag).dialog("option", "title", "Редактирай запис");
-            $(tag).dialog("option", "buttons",
+            $(selector).dialog("open");
+            $(selector).dialog("option", "title", "Редактирай запис");
+            $(selector).dialog("option", "buttons",
                     [
                         buttons("Обнови", "ui-icon-check", eventUpdateButton),
-                        buttons("Отмени", "ui-icon-cancel", closeClear)
+                        buttons("Отмени")
                     ]
                     );
             recordEdit(id);
         }
 
-        function zodiacAutocomplete() {
+        function zodiacAutocomplete(selector) {
             $(function () {
                 var availableTags = [
                     "Овен",
@@ -457,24 +473,23 @@ $(document).ready(function () {
                     "Водолей",
                     "Риби"
                 ];
-                $("#zodiac").autocomplete({
+                $(selector).autocomplete({
                     source: availableTags
                 });
             });
         }
-
 
         function onReady() {
             $("#clearLS").click(function () {
                 localStorage.clear();
             });
             listAllUsers();
-            eventAddButton();
-            eventImportButton("#importRec");
-            dialogAddEdit("#addEditDiv");
-            dialogImport("#importDiv");
-            dialogView("#viewDiv");
-            zodiacAutocomplete();
+            eventAddButton("#addRec", "#addEditDiv", "Нов запис");
+            eventImportButton("#importRec", "#importDiv");
+            dialogAddEdit("#addEditDiv", 420, 600);
+            dialogView("#viewDiv", 420, 500, "Потребител");
+            dialogImport("#importDiv", 600, 650, "Импортирай  записи");
+            zodiacAutocomplete("#zodiac");
         }
         return {
             ready: function () {
