@@ -7,15 +7,13 @@ $(document).ready(function () {
             var users = JSON.parse(localStorage.getItem(param));
             return users;
         }
-        
+
         function listAllUsers() {
             var allUsers = fetchUsers("users");
             for (user in allUsers) {
                 tableRecordAppend(user, allUsers[user]);
             }
         }
-
-
 
         function idCounter() {
             if (typeof (Storage) !== "undefined") {
@@ -157,25 +155,30 @@ $(document).ready(function () {
                     "</tr>";
             return row;
         }
-        ;
+
         function recordAdd() {
             var valid = true;
             var thisUser = {};
-            thisUser.phone = htmlEscape($("#phone").val());
-            thisUser.name = htmlEscape($("#name").val());
-            thisUser.place = htmlEscape($("#place").val());
-            thisUser.gender = htmlEscape($("#gender").val());
-            thisUser.zodiac = htmlEscape($("#zodiac").val());
-            thisUser.note = htmlEscape($("#note").val());
+            var prop = 0;
+            var masiv = ["phone", "name", "place", "gender", "zodiac", "note"];
+            var length = masiv.length;
+            for (prop = 0; prop < length; prop++) {
+                var test = masiv[prop];
+                thisUser[test] = htmlEscape($("#" + masiv[prop] + "").val());
+            }
+            /*thisUser.phone = htmlEscape($("#phone").val());
+             thisUser.name = htmlEscape($("#name").val());
+             thisUser.place = htmlEscape($("#place").val());
+             thisUser.gender = htmlEscape($("#gender").val());
+             thisUser.zodiac = htmlEscape($("#zodiac").val());
+             thisUser.note = htmlEscape($("#note").val());*/
             var char = "";
             for (char in thisUser) {
                 if (char === undefined) {
                     char = "";
                 }
             }
-
             valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
-            //var allUsers = fetchUsers("users");
             var allUsers = fetchUsers("users");
 
             if (valid && allUsers) {
@@ -198,16 +201,16 @@ $(document).ready(function () {
             var allUsers = fetchUsers("users");
             localStorage.currentId = id;
             var phone = htmlUnescape(allUsers[id].phone);
-            $("#viewDiv #phone").text(phone);
             var name = htmlUnescape(allUsers[id].name);
-            $("#viewDiv #name").text(name);
             var place = htmlUnescape(allUsers[id].place);
-            $("#viewDiv #place").text(place);
             var gender = htmlUnescape(allUsers[id].gender);
-            $("#viewDiv #gender").text(gender);
             var zodiac = htmlUnescape(allUsers[id].zodiac);
-            $("#viewDiv #zodiac").text(zodiac);
             var note = htmlUnescape(allUsers[id].note);
+            $("#viewDiv #phone").text(phone);
+            $("#viewDiv #name").text(name);
+            $("#viewDiv #place").text(place);
+            $("#viewDiv #gender").text(gender);
+            $("#viewDiv #zodiac").text(zodiac);
             $("#viewDiv #note").text(note);
         }
 
@@ -215,16 +218,16 @@ $(document).ready(function () {
             var allUsers = fetchUsers("users");
             localStorage.currentId = id;
             var phone = allUsers[id].phone;
-            $("#addEditDiv #phone").val(phone);
             var name = htmlUnescape(allUsers[id].name);
-            $("#addEditDiv #name").val(name);
             var place = allUsers[id].place;
-            $("#addEditDiv #place").val(place);
             var gender = allUsers[id].gender;
-            $("#addEditDiv #gender").val(gender);
             var zodiac = allUsers[id].zodiac;
-            $("#addEditDiv #zodiac").val(zodiac);
             var note = allUsers[id].note;
+            $("#addEditDiv #phone").val(phone);
+            $("#addEditDiv #name").val(name);
+            $("#addEditDiv #place").val(place);
+            $("#addEditDiv #gender").val(gender);
+            $("#addEditDiv #zodiac").val(zodiac);
             $("#addEditDiv #note").val(note);
         }
 
@@ -413,7 +416,6 @@ $(document).ready(function () {
 
         function dialogImport(selector, width, height, title) {
             dialogDefault(selector, width, height, title);
-            //$(selector).dialog("option", "height", height);
             $(selector).dialog("option", "buttons",
                     [
                         buttons("Запиши", "ui-icon-check", recordImport),
