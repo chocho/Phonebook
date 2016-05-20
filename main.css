@@ -19,3 +19,11 @@ input, textarea,p {
     .buttons{
         margin-top: 20px;
     }
+
+    hr{
+        margin: 0;
+    }
+    
+    .conditions{
+        font-size: 0.8em;
+    }

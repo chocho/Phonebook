@@ -1,41 +1,14 @@
 $(document).ready(function () {
-    ///////////////
     var phonebook = function () {
+        // Private variables and functions
+        
         var tips = $(".validateTips");
-        var user = {};
         var properties = ["phone", "name", "place", "gender", "zodiac", "note"];
 
         /**
-         * Fetches all users , stored in LocalStorage.
-         * @param {String} item - Item for fetching.
-         * @return {Object} users -  All users, stored in objects of an object.
+         * A counter for id's in LocalStorage .
+         * @return {String} localStorage.userId - An id number, stored as a string.
          */
-        function fetchUsers(item) {
-            var users = JSON.parse(localStorage.getItem(item));
-            return users;
-        }
-
-        /**
-         * Set stringified user objects in LocalStorage .
-         * @param {String} localStItem - A name for storing in LocalStorage.
-         * @param {String} item - Item to be stored.
-         */
-        function setUsers(localStItem, item) {
-            localStorage.setItem(localStItem, JSON.stringify(item));
-        }
-
-        /**
-         * Fetching all users from LocalStorage and listing them in a table .
-         * @param {String} localStItem - A name for storing in LocalStorage.
-         * @param {String} item - Item to be stored.
-         */
-        function listAllUsers() {
-            var allUsers = fetchUsers("users");
-            for (user in allUsers) {
-                tableRecordAppend(user, allUsers[user]);
-            }
-        }
-
         function idCounter() {
             if (typeof (Storage) !== "undefined") {
                 if (localStorage.userId) {
@@ -47,6 +20,42 @@ $(document).ready(function () {
             }
         }
 
+        /**
+         * Fetches all users , stored in LocalStorage.
+         * @param {String} item - An item to fetch.
+         * @return {Object} users -  All users, stored in objects of an object.
+         */
+        function fetchUsers(item) {
+            var users = JSON.parse(localStorage.getItem(item));
+            return users;
+        }
+
+        /**
+         * Set stringified user objects in LocalStorage .
+         * @param {String} localStItem - A name for store in LocalStorage.
+         * @param {String} item - An item to store.
+         */
+        function setUsers(localStItem, item) {
+            localStorage.setItem(localStItem, JSON.stringify(item));
+        }
+
+        /**
+         * Fetches all users from LocalStorage and lists them in a table .
+         * @param {String} users - A LocalStorage object of users to fetch.
+         */
+        function listAllUsers(users) {
+            var user = {};
+            var allUsers = fetchUsers(users);
+            for (user in allUsers) {
+                tableRecordAppend(user, allUsers[user]);
+            }
+        }
+
+        /**
+         * Escapes unallowed characters, entered by a user.
+         * @param {String} str - A string to escape.
+         * @return {String} str - The escaped string.
+         */
         function htmlEscape(str) {
             return String(str)
                     .replace(/&/g, '&amp;')
@@ -56,6 +65,11 @@ $(document).ready(function () {
                     .replace(/>/g, '&gt;');
         }
 
+        /**
+         * Un-escapes an escaped string.
+         * @param {String} value - An escaped string for un-escape.
+         * @return {String} value - The un-escaped string.
+         */
         function htmlUnescape(value) {
             return String(value)
                     .replace(/&quot;/g, '"')
@@ -65,17 +79,27 @@ $(document).ready(function () {
                     .replace(/&amp;/g, '&');
         }
 
+        /**
+         * Close a dialog and clears the input data and tips (if any).
+         */
         function closeClearData() {
             $(this).dialog("close");
             clearData();
             clearTips();
         }
+
+        /**
+         * Clears tips, if any.
+         */
         function clearTips() {
             if (tips.text !== "") {
                 tips.text("");
             }
         }
 
+        /**
+         * Removes a LocalStorage record and it's table row.
+         */
         function eventDelButton() {
             var id = localStorage.currentId;
             $(this).dialog("close");
@@ -83,6 +107,9 @@ $(document).ready(function () {
             recordRemove(id);
         }
 
+        /**
+         * Triggers a record update.
+         */
         function eventUpdateButton() {
             var id = localStorage.currentId;
             var valid = recordUpdate(id);
@@ -92,8 +119,13 @@ $(document).ready(function () {
             }
         }
 
-        function eventEditIcon(click, openDiv) {
-            $(click).click(function () {
+        /**
+         * Opens a dialog to update values of a record .
+         * @param {String} target - A button to  click.
+         * @param {String} openDiv - A div to open.
+         */
+        function eventEditIcon(target, openDiv) {
+            $(target).click(function () {
                 var id = $(this).parents("tr").attr("id");
                 $(openDiv).dialog("open");
                 $(openDiv).dialog("option", "title", "Редактирай запис");
@@ -108,19 +140,30 @@ $(document).ready(function () {
             });
         }
 
-        function eventTrashIcon(click) {
-            $(click).click(function () {
+        /**
+         * Removes a LocalStorage record and i'ts table row.
+         * @param {String} target - A button to click.
+         */
+        function eventTrashIcon(target) {
+            $(target).click(function () {
                 var id = $(this).parents("tr").attr("id");
                 $("#" + id + "").remove();
                 recordRemove(id);
             });
         }
 
-        function phoneNameCheck(restoredUsers, assignedUser, id) {
+        /**
+         * Checks if a phone and a name exists.
+         * @param {Object} allUsers - All stored users.
+         * @param {Object} thisUser - The current user.
+         * @param {String} id - Exists only when checks through update of a record.
+         * @return {Boolean} - The result of the check.
+         */
+        function phoneNameCheck(allUsers, thisUser, id) {
             var user = {};
             var currentPhone = "";
             var currentName = "";
-            for (user in restoredUsers) {
+            for (user in allUsers) {
                 if (id !== undefined) {
                     if (user === id) {
                         continue;
@@ -128,12 +171,12 @@ $(document).ready(function () {
                 } else {
                     id = 0;
                 }
-                currentPhone = restoredUsers[user].phone;
-                currentName = restoredUsers[user].name;
-                if (currentPhone === assignedUser.phone) {
+                currentPhone = allUsers[user].phone;
+                currentName = allUsers[user].name;
+                if (currentPhone === thisUser.phone) {
                     updateTips("Телефон " + currentPhone + " вече съществува.");
                     return  false;
-                } else if (currentName === assignedUser.name) {
+                } else if (currentName === thisUser.name) {
                     updateTips("Името " + currentName + " вече съществува.");
                     return  false;
                 }
@@ -141,6 +184,15 @@ $(document).ready(function () {
             return true;
         }
 
+        /**
+         * Checks if entered values are valid.
+         * @param {String} phone - Entered phone.
+         * @param {String} name - Entered name.
+         * @param {String} place - Entered place.
+         * @param {String} gender - Entered gender.
+         * @param {String} note - Entered note.
+         * @return {Boolean} - The result of the check.
+         */
         function inputValidation(phone, name, place, gender, note) {
             var valid = true;
             valid = valid && checkLength(phone, "Телефон", 5, 12);
@@ -152,6 +204,12 @@ $(document).ready(function () {
             return valid;
         }
 
+        /**
+         * Checks if entered values are valid.
+         * @param {String} rowId - An id of a table row.
+         * @param {Object} fields - Fields to  append or replace.
+         * @param {String} edit - If exists, the row will be replaced, not appended.
+         */
         function tableRecordAppend(rowId, fields, edit) {
             if (edit !== undefined) {
                 $("tr#" + rowId + "").replaceWith(appending(fields, rowId));
@@ -164,6 +222,12 @@ $(document).ready(function () {
             eventTrashIcon(".trash");
         }
 
+        /**
+         * Checks if entered values are valid.
+         * @param {Object} fields - Fields to append.
+         * @param {String} rowId - An id of a table row.
+         * @return {String} row - The row with fields appended.
+         */
         function appending(fields, rowId) {
             var field = "";
             var imgCell = "<img  class='view' src='images/view.png' width='25' height='25' alt='View icon' title='Виж запис' />";
@@ -180,6 +244,9 @@ $(document).ready(function () {
             return row;
         }
 
+        /**
+         * If valid, adds a record to LocalStorage and to a table.
+         */
         function recordAdd() {
             var valid = true;
             var thisUser = {};
@@ -210,19 +277,22 @@ $(document).ready(function () {
             }
         }
 
+        /**
+         * Default function to fetch a record and place it in a dialog window.
+         * @param {String} id - An id of a record to fetch.
+         * @param {String} mode - Checks if the mode is for viewing or editing.
+         */
         function  recordViewEditDef(id, mode) {
             var allUsers = fetchUsers("users");
             localStorage.currentId = id;
             var currentUser = allUsers[id];
             var prop = 0;
-            var arr = properties;
             var property = '';
             var selector = '';
             var currProperty = '';
-            for (prop; prop < arr.length; prop++) {
-                currProperty = arr[prop];
+            for (prop; prop < properties.length; prop++) {
+                currProperty = properties[prop];
                 property = htmlUnescape(currentUser[currProperty]);
-
                 if (mode === "view") {
                     selector = "#" + mode + "-" + currProperty;
                     $(selector).text(property);
@@ -233,25 +303,45 @@ $(document).ready(function () {
             }
         }
 
+        /**
+         * Fetches a record and places it in a dialog window for viewing.
+         * @param {String} id - An id of a record to fetch.
+         */
         function recordView(id) {
             recordViewEditDef(id, "view");
         }
 
+        /**
+         * Fetches a record and places it in a dialog window for  editing.
+         * @param {String} id - An id of a record to fetch.
+         */
         function recordEdit(id) {
             recordViewEditDef(id, "");
         }
 
+        /**
+         * Default function to fetch a record and place it in a dialog window.
+         * @param {Function} func - Function that applies to properties.
+         * @param {Object} userObject - A user object.
+         * @param {Array} properties - Properties that passes the function and 
+         * appends to the user object.
+         * @return {Object} userObject - The user object with properties added.
+         */
         function foreachUser(func, userObject, properties) {
             var prop = 0;
-            var arr = properties;
-            for (prop; prop < arr.length; prop++) {
-                var property = arr[prop];
+            for (prop; prop < properties.length; prop++) {
+                var property = properties[prop];
                 var selector = "#" + property + "";
                 userObject[property] = func($(selector).val());
             }
             return userObject;
-
         }
+
+        /**
+         * Updates a user record in LocalStorage, if passes the validation.
+         * @param {String} id - An id of a record.
+         * @return {Boolean} - The result of the update process.
+         */
         function recordUpdate(id) {
             var valid = true;
             var thisUser = {};
@@ -274,12 +364,20 @@ $(document).ready(function () {
             }
         }
 
+        /**
+         * Removes a record from LocalStorage.
+         * @param {String} id - An id of a record.
+         */
         function recordRemove(id) {
             var allUsers = fetchUsers("users");
             delete allUsers[id];
             setUsers("users", allUsers);
         }
 
+        /**
+         * Removes a record from LocalStorage.
+         * @param {String} id - An id of a record.
+         */
         function recordImport() {
             var valid = true;
             var entered = $("#textAr").val();
@@ -348,9 +446,17 @@ $(document).ready(function () {
             $(this).dialog("close");
         }
 
-        function checkLength(o, n, min, max) {
-            if (o.length > max || o.length < min) {
-                updateTips("Дължината на полето '" + n + "' трябва да бъде между " +
+        /**
+         * Checks for valid length of an input.
+         * @param {String} input - A user input.
+         * @param {String} name - The name of the input field.
+         * @param {Number} min - A min length.
+         * @param {Number} max - A max length.
+         * @return {Boolean} - The result of the check.
+         */
+        function checkLength(input, name, min, max) {
+            if (input.length > max || input.length < min) {
+                updateTips("Дължината на полето '" + name + "' трябва да бъде между " +
                         min + " и " + max + " .");
                 return false;
             } else {
@@ -358,37 +464,63 @@ $(document).ready(function () {
             }
         }
 
-        function checkRegexp(o, regexp, n) {
-            if (!(regexp.test(o))) {
-                updateTips(n);
+        /**
+         * Checks for valid characters of an input.
+         * @param {String} input - A user input.
+         * @param {RegExp} regexp - A regular expression to determine  valid characters.
+         * @param {Number} tip - A tip to show if characters are not valid.
+         * @return {Boolean} - The result of the check.
+         */
+        function checkRegexp(input, regexp, tip) {
+            if (!(regexp.test(input))) {
+                updateTips(tip);
                 return false;
             } else {
                 return true;
             }
         }
 
-        function updateTips(t) {
+        /**
+         * Shows a tip, adds and removes a class to the tip paragraph .
+         * @param {String} tip - A user input.
+         */
+        function updateTips(tip) {
             tips
-                    .text(t)
+                    .text(tip)
                     .addClass("bg-danger");
             setTimeout(function () {
                 tips.removeClass("bg-danger", 1500);
             }, 500);
         }
 
+        /**
+         * Clears values from all user input fields .
+         */
         function clearData() {
             $(':input', 'form').val('').removeAttr('checked').removeAttr('selected');
         }
-        ;
 
-        function eventViewIcon(click, openDiv) {
-            $(click).click(function () {
+        /**
+         * Bind an event handler to a view element (icon) button that open
+         *   a div with filled values.
+         * @param {String} target - An element to click (icon).
+         * @param {String} openDiv - A modal dialog div to open.
+         */        
+        function eventViewIcon(target, openDiv) {
+            $(target).click(function () {
                 var id = $(this).parents("tr").attr("id");
                 $(openDiv).dialog("open");
                 recordView(id);
             });
         }
 
+        /**
+         * Default function to create buttons in a dialog modal window.
+         * @param {String} text - A text for a button.
+         * @param {String} icons - Icons for a button.
+         * @param {String} clickFunc - An event handler to attach.
+         * @return {Object} button - The button with the text, icons and the event handler attached.
+         */
         function buttons(text, icons, clickFunc) {
             if (text === "Отмени") {
                 icons = "ui-icon-cancel";
@@ -400,11 +532,17 @@ $(document).ready(function () {
                     primary: icons
                 },
                 click: clickFunc
-
             };
             return button;
         }
 
+        /**
+         * Default modal dialog properties.
+         * @param {String} selector - A valid selector.
+         * @param {Number} width - Width for the dialog.
+         * @param {Number} height - Height for the dialog.
+         * @param {String} title - A title for the dialog.
+         */
         function dialogDefault(selector, width, height, title) {
             $(selector).dialog({
                 autoOpen: false,
@@ -415,6 +553,13 @@ $(document).ready(function () {
             });
         }
 
+        /**
+         * Creates a dialog to view a record.
+         * @param {String} selector - A valid selector.
+         * @param {Number} width - Width for the dialog.
+         * @param {Number} height - Height for the dialog.
+         * @param {String} title - A title for the dialog.
+         */
         function dialogView(selector, width, height, title) {
             dialogDefault(selector, width, height, title);
             $(selector).dialog("option", "buttons",
@@ -426,10 +571,24 @@ $(document).ready(function () {
                     );
         }
 
+        /**
+         * Creates a dialog to edit a record.
+         * @param {String} selector - A valid selector.
+         * @param {Number} width - Width for the dialog.
+         * @param {Number} height - Height for the dialog.
+         * @param {String} title - A title for the dialog.
+         */
         function dialogAddEdit(selector, width, height, title) {
             dialogDefault(selector, width, height, title);
         }
 
+        /**
+         * Creates a dialog to import many records.
+         * @param {String} selector - A valid selector.
+         * @param {Number} width - Width for the dialog.
+         * @param {Number} height - Height for the dialog.
+         * @param {String} title - A title for the dialog.
+         */
         function dialogImport(selector, width, height, title) {
             dialogDefault(selector, width, height, title);
             $(selector).dialog("option", "buttons",
@@ -441,14 +600,27 @@ $(document).ready(function () {
 
         }
 
-        function eventImportButton(clickBut, openDiv) {
-            $(clickBut).click(function () {
+        /**
+         * Bind an event handler to the Import button that open a modal window
+         * for importing many records.
+         * @param {String} target - A button to click.
+         * @param {String} openDiv - A modal dialog div to open.
+         */
+        function eventImportButton(target, openDiv) {
+            $(target).click(function () {
                 $(openDiv).dialog("open");
             });
         }
 
-        function eventAddButton(clickBut, openDiv, title) {
-            $(clickBut).click(function () {
+        /**
+         * Bind an event handler to the Add button that open a modal window
+         * for adding a record.
+         * @param {String} target - A button to click.
+         * @param {String} openDiv - A modal dialog div to open.
+         * @param {String} title - A title to set.
+         */
+        function eventAddButton(target, openDiv, title) {
+            $(target).click(function () {
                 $(openDiv).dialog("open");
                 $(openDiv).dialog("option", "title", title);
                 $(openDiv).dialog("option", "buttons",
@@ -460,6 +632,10 @@ $(document).ready(function () {
             });
         }
 
+        /**
+         * Bind an event handler to the Edit button that open a modal window
+         * to edit a record.
+         */
         function eventEditButton() {
             var selector = "#addEditDiv";
             var id = localStorage.currentId;
@@ -475,7 +651,12 @@ $(document).ready(function () {
             recordEdit(id);
         }
 
-        function zodiacAutocomplete(selector) {
+        /**
+         * Enables users to quickly find and select from a pre-populated list of
+         * values as they type in the zodiac field.
+         * @param {String} target - A field to type in.
+         */
+        function zodiacAutocomplete(target) {
             $(function () {
                 var availableTags = [
                     "Овен",
@@ -491,24 +672,30 @@ $(document).ready(function () {
                     "Водолей",
                     "Риби"
                 ];
-                $(selector).autocomplete({
+                $(target).autocomplete({
                     source: availableTags
                 });
             });
         }
 
+        /**
+         * Determines a predefined set of function to execute when a document
+         * is ready (loaded).
+         */
         function onReady() {
             $("#clearLS").click(function () {
                 localStorage.clear();
             });
-            listAllUsers();
+            listAllUsers("users");
             eventAddButton("#addRec", "#addEditDiv", "Нов запис");
             eventImportButton("#importRec", "#importDiv");
-            dialogAddEdit("#addEditDiv", 420, 600);
-            dialogView("#viewDiv", 420, 500, "Потребител");
+            dialogAddEdit("#addEditDiv", 420, 600, '');
+            dialogView("#viewDiv", 420, 550, "Потребител");
             dialogImport("#importDiv", 600, 650, "Импортирай  записи");
             zodiacAutocomplete("#zodiac");
         }
+
+        // Public API
         return {
             ready: function () {
                 onReady();

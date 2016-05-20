@@ -8,11 +8,8 @@
         <title>Телефонен указател</title>
         <meta name="viewport" content="width=device-width">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        <link rel="stylesheet" href="main.css">
         <link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
-        <script src="//code.jquery.com/jquery-1.10.2.js"></script>
-        <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
-        <script src="script.js"></script>
+        <link rel="stylesheet" href="main.css">
     </head>
     <body>
         <div class="container">
@@ -25,25 +22,25 @@
             </div>
             <br />
             <div>
-            <table id="phoneTable" class="table table-striped">
-                <tbody>
-                    <tr class="row">
-                        <th class="col-md-2">Телефон</th>
-                        <th class="col-md-3">Име</th>
-                        <th class="col-md-3">Населено място</th>
-                        <th class="col-md-1">Пол</th>
-                        <th class="col-md-2">Зодия</th>
-                        <th class="col-md-1"></th>
-                    </tr>
-                </tbody>
-            </table>
+                <table id="phoneTable" class="table table-striped">
+                    <tbody>
+                        <tr class="row">
+                            <th class="col-md-2">Телефон</th>
+                            <th class="col-md-3">Име</th>
+                            <th class="col-md-3">Населено място</th>
+                            <th class="col-md-1">Пол</th>
+                            <th class="col-md-2">Зодия</th>
+                            <th class="col-md-1"></th>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
             <div class="text-center">
                 &copy2016
             </div>
         </div>
         <div id="addEditDiv">
-            <p><i>Полетата със звезда са задължителни.</i></p>
+            <p class="conditions"><i>Полетата със звезда са задължителни.</i></p>
             <p class="validateTips"></p>
             <form>
                 <fieldset>
@@ -78,24 +75,30 @@
                 </fieldset>
             </form>
         </div>
-
+        
         <div id="viewDiv">
             <h4>Телефон</h4>
             <p  id="view-phone"></p>
+            <hr />
             <h4>Име</h4>
             <p  id="view-name"></p>
+            <hr />
             <h4>Населено място</h4>
             <p id="view-place"></p>
+            <hr />
             <h4>Пол</h4>
             <p id="view-gender"></p>
+            <hr />
             <h4>Зодия</h4>
             <p id="view-zodiac"></p>
+            <hr />
             <h4>Бележки</h4>
-            <p  id="view-note"> </p>
+            <p  id="view-note"></p>
+            <hr />
         </div>
 
         <div id="importDiv" class="form-group">
-            <p><i>Поставете (paste) <b>предварително подготвени</b> записи, които да бъдат импортирани наведнъж. Всеки запис е на отделен ред.
+            <p class="conditions"><i>Поставете (paste) <b>предварително подготвени</b> записи, които да бъдат импортирани наведнъж. Всеки запис е на отделен ред.
                     Полетата в рамките на даден запис са разделени с TAB, като те се очаква да бъдат в следната последователност:
                     1*)	телефонен номер,
                     2*)	име на контакт,
@@ -107,5 +110,8 @@
             <p class="validateTips"></p>
             <textarea class="form-control" id = "textAr"  autofocus></textarea>
         </div>
+        <script src="//code.jquery.com/jquery-1.10.2.js"></script>
+        <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+        <script src="script.js"></script>
     </body>
 </html>
