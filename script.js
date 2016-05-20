@@ -676,6 +676,16 @@ $(document).ready(function () {
             });
         }
 
+        function changePointer() {
+            $(".trash, .view, .edit").hover(
+                    function () {
+                        $(this).css('cursor', 'pointer');
+                    }, function () {
+                $(this).css('cursor', 'initial');
+            }
+            );
+        }
+
         /**
          * Determines a predefined set of function to execute when a document
          * is ready (loaded).
@@ -689,6 +699,7 @@ $(document).ready(function () {
             dialogView("#viewDiv", 420, 550, "Потребител");
             dialogImport("#importDiv", 600, 650, "Импортирай  записи");
             zodiacAutocomplete("#zodiac");
+            changePointer();
         }
 
         // Public API
