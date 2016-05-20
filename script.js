@@ -1,9 +1,11 @@
 $(document).ready(function () {
-    var phonebook = function () {
+    var list = function () {
         // Private variables and functions
-        
+
         var tips = $(".validateTips");
         var properties = ["phone", "name", "place", "gender", "zodiac", "note"];
+        var availableZodiac = ["Овен", "Телец", "Близнаци", "Рак", "Лъв", "Дева",
+            "Везни", "Скорпион", "Стрелец", "Козирог", "Водолей", "Риби"];
 
         /**
          * A counter for id's in LocalStorage .
@@ -103,6 +105,10 @@ $(document).ready(function () {
         function eventDelButton() {
             var id = localStorage.currentId;
             $(this).dialog("close");
+            var isOpen = $("#viewDiv").dialog("isOpen");
+            if (isOpen) {
+                $("#viewDiv").dialog("close");
+            }
             $("tr#" + id + "").remove();
             recordRemove(id);
         }
@@ -147,9 +153,23 @@ $(document).ready(function () {
         function eventTrashIcon(target) {
             $(target).click(function () {
                 var id = $(this).parents("tr").attr("id");
-                $("#" + id + "").remove();
-                recordRemove(id);
+                localStorage.currentId = id;
+                dialogTrashRec();
             });
+        }
+
+        /**
+         * Opens a dialog for delete confirmation.
+         */
+        function dialogTrashRec() {
+            $("#dialog-confirm").dialog("open");
+            $("#dialog-confirm").dialog("option", "buttons",
+                    [
+                        buttons("Изтрий", "ui-icon-trash", eventDelButton),
+                        buttons("Отмени")
+                    ]
+                    );
+
         }
 
         /**
@@ -190,16 +210,21 @@ $(document).ready(function () {
          * @param {String} name - Entered name.
          * @param {String} place - Entered place.
          * @param {String} gender - Entered gender.
+         * @param {String} zodiac - Entered zodiac.
          * @param {String} note - Entered note.
          * @return {Boolean} - The result of the check.
          */
-        function inputValidation(phone, name, place, gender, note) {
+        function inputValidation(phone, name, place, gender, zodiac, note) {
             var valid = true;
             valid = valid && checkLength(phone, "Телефон", 5, 12);
             valid = valid && checkRegexp(phone, /[0+]\d+/, "Телефонът трябва да започва с + или 0, последвани от цифри 0-9");
             valid = valid && checkLength(name, "Име", 1, 30);
             valid = valid && checkLength(place, "Населено място", 0, 30);
             valid = valid && checkRegexp(gender, /[мж]{1}/, "Моля, изберете пол.");
+            valid = valid && checkLength(zodiac, "Зодия", 0, 8);
+            if (zodiac !== '') {
+                valid = valid && checkRegexp(zodiac, /Овен|Телец|Близнаци|Рак|Лъв|Дева|Везни|Скорпион|Стрелец|Козирог|Водолей|Риби/, "Невалидна зодия.");
+            }
             valid = valid && checkLength(note, "Бележки", 0, 500);
             return valid;
         }
@@ -257,7 +282,7 @@ $(document).ready(function () {
                     char = "";
                 }
             }
-            valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
+            valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.zodiac, thisUser.note);
             var allUsers = fetchUsers("users");
 
             if (valid && allUsers) {
@@ -346,7 +371,7 @@ $(document).ready(function () {
             var valid = true;
             var thisUser = {};
             thisUser = foreachUser(htmlEscape, thisUser, properties);
-            valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
+            valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.zodiac, thisUser.note);
             var allUsers = fetchUsers("users");
             if (valid && allUsers) {
                 valid = phoneNameCheck(allUsers, thisUser, id);
@@ -375,62 +400,40 @@ $(document).ready(function () {
         }
 
         /**
-         * Removes a record from LocalStorage.
-         * @param {String} id - An id of a record.
+         * Imports many records, if pass the validation.
          */
         function recordImport() {
             var valid = true;
+            var user = [];
             var entered = $("#textAr").val();
             if (!entered) {
                 updateTips("Моля, въведете данни.");
                 return valid = false;
             }
-            var res = entered.match(/.+$/gm);
+            var rowsEntered = entered.match(/.+$/gm); //returns all entered rows
             var allUsers = fetchUsers("users");
             if (!allUsers) {
-                var allUsers = {};
+                allUsers = {};
             }
-            var fLen = res.length;
-            var c = 0;
-            for (c = 0; c < fLen; c++) {
+            var num = 0;
+            for (num; num < rowsEntered.length; num++) {
                 var thisUser = {};
-                var user = res[c].split("\t");
-                if (user[0]) {
-                    thisUser.phone = user[0];
-                } else {
-                    thisUser.phone = "";
-                }
-                if (user[1]) {
-                    thisUser.name = user[1];
-                } else {
-                    thisUser.name = "";
-                }
-                if (user[2]) {
-                    thisUser.place = user[2];
-                } else {
-                    thisUser.place = "";
-                }
-                if (user[3]) {
-                    thisUser.gender = user[3];
-                } else {
-                    thisUser.gender = "";
-                }
-                if (user[4]) {
-                    thisUser.zodiac = user[4];
-                } else {
-                    thisUser.zodiac = "";
-                }
-                if (user[5]) {
-                    thisUser.note = user[5];
-                } else {
-                    thisUser.note = "";
+                user = rowsEntered[num].split("\t"); //splits fields by Tab
+                var prop = 0;
+                for (prop; prop < properties.length; prop++) {
+                    var property = properties[prop];
+                    if (user[num]) {
+                        thisUser[property] = user[prop];
+                    } else {
+                        thisUser[property] = "";
+                    }
                 }
 
-                valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.note);
+                valid = inputValidation(thisUser.phone, thisUser.name, thisUser.place, thisUser.gender, thisUser.zodiac, thisUser.note);
                 if (valid && allUsers) {
                     valid = phoneNameCheck(allUsers, thisUser);
                 } else {
-                    var allUsers = {};
+                    allUsers = {};
                 }
                 if (valid) {
                     idCounter();
@@ -488,9 +491,6 @@ $(document).ready(function () {
             tips
                     .text(tip)
                     .addClass("bg-danger");
-            setTimeout(function () {
-                tips.removeClass("bg-danger", 1500);
-            }, 500);
         }
 
         /**
@@ -505,7 +505,7 @@ $(document).ready(function () {
          *   a div with filled values.
          * @param {String} target - An element to click (icon).
          * @param {String} openDiv - A modal dialog div to open.
-         */        
+         */
         function eventViewIcon(target, openDiv) {
             $(target).click(function () {
                 var id = $(this).parents("tr").attr("id");
@@ -565,7 +565,7 @@ $(document).ready(function () {
             $(selector).dialog("option", "buttons",
                     [
                         buttons("Редактирай", "ui-icon-pencil", eventEditButton),
-                        buttons("Изтрий", "ui-icon-trash", eventDelButton),
+                        buttons("Изтрий", "ui-icon-trash", dialogTrashRec),
                         buttons("Отмени")
                     ]
                     );
@@ -579,6 +579,17 @@ $(document).ready(function () {
          * @param {String} title - A title for the dialog.
          */
         function dialogAddEdit(selector, width, height, title) {
+            dialogDefault(selector, width, height, title);
+        }
+
+        /**
+         * Creates a dialog to confirm deletion of a record.
+         * @param {String} selector - A valid selector.
+         * @param {Number} width - Width for the dialog.
+         * @param {Number} height - Height for the dialog.
+         * @param {String} title - A title for the dialog.
+         */
+        function dialogDeleteConfirm(selector, width, height, title) {
             dialogDefault(selector, width, height, title);
         }
 
@@ -599,6 +610,7 @@ $(document).ready(function () {
                     );
 
         }
+
 
         /**
          * Bind an event handler to the Import button that open a modal window
@@ -658,22 +670,8 @@ $(document).ready(function () {
          */
         function zodiacAutocomplete(target) {
             $(function () {
-                var availableTags = [
-                    "Овен",
-                    "Телец",
-                    "Близнаци",
-                    "Рак",
-                    "Лъв",
-                    "Дева",
-                    "Везни",
-                    "Скорпион",
-                    "Стрелец",
-                    "Козирог",
-                    "Водолей",
-                    "Риби"
-                ];
                 $(target).autocomplete({
-                    source: availableTags
+                    source: availableZodiac
                 });
             });
         }
@@ -683,13 +681,11 @@ $(document).ready(function () {
          * is ready (loaded).
          */
         function onReady() {
-            $("#clearLS").click(function () {
-                localStorage.clear();
-            });
             listAllUsers("users");
             eventAddButton("#addRec", "#addEditDiv", "Нов запис");
             eventImportButton("#importRec", "#importDiv");
-            dialogAddEdit("#addEditDiv", 420, 600, '');
+            dialogAddEdit("#addEditDiv", 420, 650, '');
+            dialogDeleteConfirm("#dialog-confirm", 320, 180, 'Изтриване на потребител?');
             dialogView("#viewDiv", 420, 550, "Потребител");
             dialogImport("#importDiv", 600, 650, "Импортирай  записи");
             zodiacAutocomplete("#zodiac");
@@ -702,6 +698,6 @@ $(document).ready(function () {
             }
         };
     };
-    var list = phonebook();
-    list.ready();
+    var phonebook = list();
+    phonebook.ready();
 });

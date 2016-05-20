@@ -16,8 +16,7 @@
             <div class="row">
                 <div  class="col-md-8"><h2>Телефонен указател</h2></div>
                 <div class="col-md-4 buttons">   <button type="button" class="btn btn-primary" id="addRec">Добави запис</button>
-                    <button type="button" class="btn btn-primary" id="importRec">Импортирай записи</button>
-                    <button type="button" class="btn btn-danger" id="clearLS">Изтрий всичко</button>     
+                    <button type="button" class="btn btn-primary" id="importRec">Импортирай записи</button>                     
                 </div>
             </div>
             <br />
@@ -45,15 +44,15 @@
             <form>
                 <fieldset>
                     <div class="form-group">
-                        <label for="phone">Телефон (5-12)*</label>
+                        <label for="phone">Телефон* <span class="conditions"> (5-12 цифри; 0хх.., +хх..)</span></label>
                         <input type="text" class="form-control" id="phone">
                     </div>
                     <div class="form-group">
-                        <label for="name">Име (1-30) *</label>
+                        <label for="name">Име* <span class="conditions"> (1-30)</span></label>
                         <input type="text" class="form-control" id="name">
                     </div>
                     <div class="form-group">
-                        <label for="place">Населено място (0-30)</label>
+                        <label for="place">Населено място <span class="conditions">(0-30)</span></label>
                         <input type="text" class="form-control" id="place">
                     </div>
                     <div class="form-group">
@@ -65,17 +64,17 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="zodiac">Зодия</label><br />
+                        <label for="zodiac">Зодия <span class="conditions">(Изберете от списъка)</span></label><br />
                         <input id="zodiac">
                     </div>
                     <div class="form-group">
-                        <label for="note">Бележки (0-500)</label>
+                        <label for="note">Бележки <span class="conditions">(0-500)</span></label>
                         <textarea class="form-control" id="note"></textarea>
                     </div>
                 </fieldset>
             </form>
         </div>
-        
+
         <div id="viewDiv">
             <h4>Телефон</h4>
             <p  id="view-phone"></p>
@@ -110,6 +109,11 @@
             <p class="validateTips"></p>
             <textarea class="form-control" id = "textAr"  autofocus></textarea>
         </div>
+
+        <div id="dialog-confirm" title="Empty the recycle bin?">
+            <p><span id ="delete-alert" class="ui-icon ui-icon-alert"></span>Сигурни ли сте, че искате да изтриете този потребител?</p>
+        </div>
+
         <script src="//code.jquery.com/jquery-1.10.2.js"></script>
         <script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
         <script src="script.js"></script>
