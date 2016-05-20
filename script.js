@@ -245,6 +245,7 @@ $(document).ready(function () {
             eventViewIcon(".view", "#viewDiv");
             eventEditIcon(".edit", "#addEditDiv");
             eventTrashIcon(".trash");
+            changePointer(".trash, .view, .edit");
         }
 
         /**
@@ -675,9 +676,14 @@ $(document).ready(function () {
                 });
             });
         }
-
-        function changePointer() {
-            $(".trash, .view, .edit").hover(
+        
+        /**
+         * Bind an event handler to an element. Changes cursor when hover on,
+         * restores default when hover off.
+         * @param {String} target - A target for the event
+         */
+        function changePointer(target) {
+            $(target).hover(
                     function () {
                         $(this).css('cursor', 'pointer');
                     }, function () {
@@ -699,7 +705,6 @@ $(document).ready(function () {
             dialogView("#viewDiv", 420, 550, "Потребител");
             dialogImport("#importDiv", 600, 650, "Импортирай  записи");
             zodiacAutocomplete("#zodiac");
-            changePointer();
         }
 
         // Public API
