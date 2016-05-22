@@ -27,6 +27,7 @@ input, textarea,p {
     .conditions{
         font-size: 0.8em;
     }
+    
     #delete-alert{
         float:left; 
         margin:0 7px 20px 0;

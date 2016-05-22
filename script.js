@@ -679,7 +679,7 @@ $(document).ready(function () {
         
         /**
          * Bind an event handler to an element. Changes cursor when hover on,
-         * restores default when hover off.
+         * restores default when hover off..
          * @param {String} target - A target for the event
          */
         function changePointer(target) {
@@ -700,10 +700,10 @@ $(document).ready(function () {
             listAllUsers("users");
             eventAddButton("#addRec", "#addEditDiv", "Нов запис");
             eventImportButton("#importRec", "#importDiv");
-            dialogAddEdit("#addEditDiv", 420, 650, '');
+            dialogAddEdit("#addEditDiv", 420, 660, '');
             dialogDeleteConfirm("#dialog-confirm", 320, 180, 'Изтриване на потребител?');
             dialogView("#viewDiv", 420, 550, "Потребител");
-            dialogImport("#importDiv", 600, 650, "Импортирай  записи");
+            dialogImport("#importDiv", 600, 660, "Импортирай  записи");
             zodiacAutocomplete("#zodiac");
         }
 
