@@ -216,6 +216,9 @@ $(document).ready(function () {
          */
         function inputValidation(phone, name, place, gender, zodiac, note) {
             var valid = true;
+            var zodiacs = availableZodiac.toString();
+            zodiacs = zodiacs.replace(/,/g, "|");
+            var regexZodiac = new RegExp(zodiacs);
             valid = valid && checkLength(phone, "Телефон", 5, 12);
             valid = valid && checkRegexp(phone, /[0+]\d+/, "Телефонът трябва да започва с + или 0, последвани от цифри 0-9");
             valid = valid && checkLength(name, "Име", 1, 30);
@@ -223,7 +226,8 @@ $(document).ready(function () {
             valid = valid && checkRegexp(gender, /[мж]{1}/, "Моля, изберете пол.");
             valid = valid && checkLength(zodiac, "Зодия", 0, 8);
             if (zodiac !== '') {
-                valid = valid && checkRegexp(zodiac, /Овен|Телец|Близнаци|Рак|Лъв|Дева|Везни|Скорпион|Стрелец|Козирог|Водолей|Риби/, "Невалидна зодия.");
+                //valid = valid && checkRegexp(zodiac, /Овен|Телец|Близнаци|Рак|Лъв|Дева|Везни|Скорпион|Стрелец|Козирог|Водолей|Риби/, "Невалидна зодия.");
+                valid = valid && checkRegexp(zodiac, regexZodiac, "Невалидна зодия.");
             }
             valid = valid && checkLength(note, "Бележки", 0, 500);
             return valid;
@@ -442,11 +446,12 @@ $(document).ready(function () {
                     allUsers[localStorage.userId] = thisUser;
                     setUsers("users", allUsers);
                     clearTips();
+                    clearData();
                 } else {
                     return false;
                 }
             }
-            setUsers("users", allUsers);
+            //setUsers("users", allUsers);
             $(this).dialog("close");
         }
 
@@ -499,6 +504,7 @@ $(document).ready(function () {
          */
         function clearData() {
             $(':input', 'form').val('').removeAttr('checked').removeAttr('selected');
+            $( '#textAr').val('');
         }
 
         /**
